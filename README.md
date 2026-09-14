@@ -22,11 +22,15 @@ their records.
 
 ```bash
 npm install
-cp .env.example .env   # fill in DATABASE_URL at minimum
+cp .env.example .env   # fill in DATABASE_URL (and DIRECT_URL if pooled) at minimum
 npm run db:push        # create tables from prisma/schema.prisma
 npm run db:seed        # seed the DfE standards catalogue
 npm run dev
 ```
+
+Any Postgres works, including [Neon](https://neon.tech)'s free tier — grab
+the pooled connection string for `DATABASE_URL` and the direct one for
+`DIRECT_URL` from the Neon console.
 
 Visit `/signup` to create your school's account (this creates a `Tenant` and
 its first `ADMIN` user), or `/login` to sign in.
