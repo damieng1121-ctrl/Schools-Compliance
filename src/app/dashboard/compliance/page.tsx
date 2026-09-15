@@ -75,7 +75,7 @@ export default function CompliancePage() {
               href="https://www.gov.uk/guidance/meeting-digital-and-technology-standards-in-schools-and-colleges"
               target="_blank"
               rel="noreferrer"
-              className="font-medium text-red-600 hover:underline"
+              className="font-medium text-slate-900 hover:underline"
             >
               the latest official guidance on GOV.UK
             </a>{" "}
@@ -133,7 +133,7 @@ export default function CompliancePage() {
                     href={standard.officialUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline"
+                    className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-slate-900 hover:underline"
                   >
                     Official DfE guidance
                     <ExternalLink size={11} />
@@ -220,7 +220,7 @@ function ComplianceItemRow({
               href={item.govLink}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-medium text-slate-900 hover:underline"
             >
               Specific DfE guidance for this item
               <ExternalLink size={11} />
@@ -232,7 +232,7 @@ function ComplianceItemRow({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as Assessment["status"])}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
               >
                 <option value="NOT_STARTED">Not started</option>
                 <option value="IN_PROGRESS">In progress</option>
@@ -247,7 +247,7 @@ function ComplianceItemRow({
                 type="date"
                 value={nextReviewDue}
                 onChange={(e) => setNextReviewDue(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100"
+                className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
               />
             </div>
           </div>
@@ -257,7 +257,7 @@ function ComplianceItemRow({
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100"
+              className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
               placeholder="e.g. link to policy document, contract, or a description of current setup"
             />
           </div>
@@ -267,7 +267,7 @@ function ComplianceItemRow({
               value={evidenceUrl}
               onChange={(e) => setEvidenceUrl(e.target.value)}
               placeholder="https://…"
-              className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100"
+              className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
             />
           </div>
           <Button size="sm" onClick={save} disabled={saving}>

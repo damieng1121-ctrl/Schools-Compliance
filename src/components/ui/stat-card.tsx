@@ -3,7 +3,7 @@ import { Card } from "./card";
 
 const TONES = {
   neutral: "bg-slate-100 text-slate-600",
-  brand: "bg-red-50 text-red-600",
+  brand: "bg-slate-100 text-slate-700",
   good: "bg-emerald-50 text-emerald-600",
   warn: "bg-amber-50 text-amber-600",
   bad: "bg-red-50 text-red-600",

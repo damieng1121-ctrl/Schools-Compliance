@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { inputClass, labelClass } from "@/components/ui/input";
+import { ComplianceReadOnly } from "@/components/compliance-readonly";
 
 type Member = {
   id: string;
@@ -131,7 +132,7 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
 
   return (
     <div>
-      <Link href="/dashboard/super-admin" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-red-600">
+      <Link href="/dashboard/super-admin" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900">
         <ArrowLeft size={14} />
         All schools
       </Link>
@@ -254,6 +255,10 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
           {school.users.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">No users yet.</p>}
         </div>
       </Card>
+
+      <div className="mt-6">
+        <ComplianceReadOnly tenantId={tenantId} />
+      </div>
     </div>
   );
 }

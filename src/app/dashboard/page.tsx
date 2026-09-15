@@ -44,7 +44,7 @@ export default async function DashboardOverviewPage() {
           </p>
           <Link
             href="/dashboard/compliance"
-            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700"
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-slate-900 hover:text-slate-700"
           >
             Go to checklist
             <ArrowRight size={15} />
@@ -66,7 +66,7 @@ export default async function DashboardOverviewPage() {
           </p>
           <Link
             href="/dashboard/compliance"
-            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-900 hover:text-slate-700"
           >
             Open the checklist
             <ArrowRight size={15} />

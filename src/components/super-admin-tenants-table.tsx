@@ -128,7 +128,7 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
               return (
                 <tr key={t.id} className="transition-colors hover:bg-slate-50/60">
                   <td className="px-5 py-3">
-                    <Link href={`/dashboard/super-admin/${t.id}`} className="font-medium text-slate-900 hover:text-red-600 hover:underline">
+                    <Link href={`/dashboard/super-admin/${t.id}`} className="font-medium text-slate-900 hover:underline">
                       {t.name}
                     </Link>
                     <p className="text-xs text-slate-500">{t.slug}</p>

@@ -66,13 +66,13 @@ export function DashboardNav({
               href={link.href}
               className={clsx(
                 "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                active ? "bg-red-50 text-red-700" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                active ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
               )}
             >
-              {active && <span className="absolute -left-3 h-5 w-1 rounded-r-full bg-red-600" />}
-              <Icon size={17} strokeWidth={2.25} className={active ? "text-red-600" : "text-slate-400 group-hover:text-slate-500"} />
+              {active && <span className="absolute -left-3 h-5 w-1 rounded-r-full bg-slate-900" />}
+              <Icon size={17} strokeWidth={2.25} className={active ? "text-slate-900" : "text-slate-400 group-hover:text-slate-500"} />
               {link.label}
-              {active && <ChevronRight size={14} className="ml-auto text-red-400" />}
+              {active && <ChevronRight size={14} className="ml-auto text-slate-400" />}
             </Link>
           );
         })}

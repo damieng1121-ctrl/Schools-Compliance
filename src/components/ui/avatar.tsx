@@ -6,11 +6,11 @@ function initials(name: string): string {
 }
 
 const PALETTE = [
-  "bg-red-100 text-red-700",
   "bg-amber-100 text-amber-700",
   "bg-emerald-100 text-emerald-700",
   "bg-sky-100 text-sky-700",
   "bg-violet-100 text-violet-700",
+  "bg-teal-100 text-teal-700",
 ];
 
 function paletteFor(name: string): string {

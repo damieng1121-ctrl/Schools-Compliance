@@ -40,7 +40,7 @@ export default async function HomePage() {
       <div className="mt-16 grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
         {FEATURES.map(({ icon: Icon, title, text }) => (
           <Card key={title} className="p-5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
               <Icon size={18} />
             </span>
             <p className="mt-3 text-sm font-semibold text-slate-900">{title}</p>

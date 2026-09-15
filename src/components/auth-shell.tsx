@@ -25,18 +25,20 @@ export function AuthPanel({
   points: { icon: LucideIcon; text: string }[];
 }) {
   return (
-    <div className="flex h-full flex-col justify-between bg-gradient-to-br from-red-600 to-red-700 p-10 text-white">
+    <div className="flex h-full flex-col justify-between bg-gradient-to-br from-slate-900 to-slate-800 p-10 text-white">
       <div className="flex items-center gap-2.5">
-        <PlatformBadge size={32} />
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white p-1">
+          <PlatformBadge size={24} />
+        </span>
         <span className="text-[15px] font-bold tracking-tight">Schools Compliance</span>
       </div>
       <div>
         <h2 className="max-w-sm text-3xl font-bold leading-tight tracking-tight">{title}</h2>
-        <p className="mt-3 max-w-sm text-sm text-red-100">{description}</p>
+        <p className="mt-3 max-w-sm text-sm text-slate-300">{description}</p>
         <ul className="mt-8 space-y-3">
           {points.map(({ icon: Icon, text }) => (
-            <li key={text} className="flex items-center gap-3 text-sm text-red-50">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15">
+            <li key={text} className="flex items-center gap-3 text-sm text-slate-200">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10">
                 <Icon size={16} />
               </span>
               {text}
@@ -44,7 +46,7 @@ export function AuthPanel({
           ))}
         </ul>
       </div>
-      <p className="text-xs text-red-200">DfE Meeting Digital &amp; Technology Standards</p>
+      <p className="text-xs text-slate-400">DfE Meeting Digital &amp; Technology Standards</p>
     </div>
   );
 }
