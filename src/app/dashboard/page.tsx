@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { CheckCircle2, XCircle, CircleDashed, ArrowRight, CalendarClock } from "lucide-react";
 import { requireTenantSession } from "@/lib/session";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { Card } from "@/components/ui/card";
+import { ReadinessRing } from "@/components/ui/readiness-ring";
 
 export default async function DashboardOverviewPage() {
   const rawSession = await auth();
@@ -29,51 +32,88 @@ export default async function DashboardOverviewPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Overview</h1>
-      <p className="mt-1 text-sm text-slate-600">Your school&apos;s readiness against the DfE digital &amp; technology standards.</p>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Overview</h1>
+      <p className="mt-1 text-sm text-slate-500">Your school&apos;s readiness against the DfE digital &amp; technology standards.</p>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Stat label="Overall readiness" value={`${overallPct}%`} />
-        <Stat label="Standards met" value={`${compliant} / ${allItems.length}`} />
-        <Stat label="Non-compliant" value={nonCompliant} highlight={nonCompliant > 0} />
-        <Stat label="Not started" value={notStarted} />
-      </div>
-
-      <div className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-slate-900">Next steps</h2>
-          <Link href="/dashboard/compliance" className="text-sm text-indigo-600 hover:underline">
-            Go to checklist →
+      <Card className="mt-6 flex flex-col items-center gap-6 p-6 sm:flex-row sm:items-center">
+        <ReadinessRing pct={overallPct} />
+        <div className="flex-1 text-center sm:text-left">
+          <p className="text-sm font-medium text-slate-500">Overall readiness</p>
+          <p className="mt-0.5 text-lg font-semibold text-slate-900">
+            {compliant} of {allItems.length} standards met
+          </p>
+          <Link
+            href="/dashboard/compliance"
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700"
+          >
+            Go to checklist
+            <ArrowRight size={15} />
           </Link>
         </div>
-        <p className="mt-2 text-sm text-slate-600">
-          Work through the checklist, tick off each item as you meet it, and email yourself a report to
-          keep for your records.
-        </p>
-      </div>
-
-      {upcomingReviews.length > 0 && (
-        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5">
-          <h2 className="font-semibold text-slate-900">Upcoming reviews</h2>
-          <ul className="mt-3 divide-y divide-slate-100 text-sm">
-            {upcomingReviews.map((a) => (
-              <li key={a.id} className="flex items-center justify-between py-2">
-                <span className="text-slate-700">Review due</span>
-                <span className="text-slate-900">{new Date(a.nextReviewDue!).toLocaleDateString("en-GB")}</span>
-              </li>
-            ))}
-          </ul>
+        <div className="grid w-full grid-cols-3 gap-3 sm:w-auto">
+          <MiniStat icon={CheckCircle2} label="Met" value={compliant} tone="text-emerald-600" />
+          <MiniStat icon={XCircle} label="Non-compliant" value={nonCompliant} tone="text-red-600" />
+          <MiniStat icon={CircleDashed} label="Not started" value={notStarted} tone="text-slate-400" />
         </div>
-      )}
+      </Card>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card className="p-6">
+          <h2 className="font-semibold text-slate-900">Keep it up to date</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            Work through the checklist, tick off each item as you meet it, and email yourself a report to
+            keep for your records.
+          </p>
+          <Link
+            href="/dashboard/compliance"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700"
+          >
+            Open the checklist
+            <ArrowRight size={15} />
+          </Link>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center gap-2">
+            <CalendarClock size={17} className="text-slate-400" />
+            <h2 className="font-semibold text-slate-900">Upcoming reviews</h2>
+          </div>
+          {upcomingReviews.length > 0 ? (
+            <ul className="mt-3 divide-y divide-slate-100 text-sm">
+              {upcomingReviews.map((a) => (
+                <li key={a.id} className="flex items-center justify-between py-2">
+                  <span className="text-slate-600">Review due</span>
+                  <span className="font-medium text-slate-900">
+                    {new Date(a.nextReviewDue!).toLocaleDateString("en-GB")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-3 text-sm text-slate-500">Nothing scheduled yet — set review dates on the checklist.</p>
+          )}
+        </Card>
+      </div>
     </div>
   );
 }
 
-function Stat({ label, value, highlight }: { label: string; value: string | number; highlight?: boolean }) {
+function MiniStat({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  value: number;
+  tone: string;
+}) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5">
-      <p className="text-sm text-slate-700">{label}</p>
-      <p className={`mt-1 text-3xl font-semibold ${highlight ? "text-red-600" : "text-slate-900"}`}>{value}</p>
+    <div className="flex flex-col items-center gap-1 rounded-xl bg-slate-50 px-3 py-3 text-center">
+      <Icon size={16} className={tone} />
+      <span className="text-lg font-bold text-slate-900">{value}</span>
+      <span className="text-[11px] leading-tight text-slate-500">{label}</span>
     </div>
   );
 }

@@ -13,8 +13,10 @@ export function PlatformBadge({ size = 40 }: { size?: number }) {
         textAnchor="middle"
         fill="white"
         fontFamily="system-ui, sans-serif"
-        fontSize="8.5"
-        fontWeight="400"
+        fontSize="7"
+        fontWeight="500"
+        textLength="30"
+        lengthAdjust="spacingAndGlyphs"
       >
         Education
       </text>

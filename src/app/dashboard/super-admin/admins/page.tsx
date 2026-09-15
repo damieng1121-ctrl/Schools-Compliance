@@ -15,8 +15,8 @@ export default async function PlatformAdminsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Platform admins</h1>
-      <p className="mt-1 text-sm text-slate-600">Everyone here can see and manage every school on the platform.</p>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Platform admins</h1>
+      <p className="mt-1 text-sm text-slate-500">Everyone here can see and manage every school on the platform.</p>
       <div className="mt-6">
         <PlatformAdminsTable
           initialAdmins={admins.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() }))}

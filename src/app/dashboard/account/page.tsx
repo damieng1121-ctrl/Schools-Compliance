@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { KeyRound } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { inputClass, labelClass } from "@/components/ui/input";
 
 export default function AccountPage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -33,45 +37,46 @@ export default function AccountPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Account</h1>
-      <div className="mt-6 max-w-sm rounded-xl border border-slate-200 bg-white p-5">
-        <h2 className="font-semibold text-slate-900">Change password</h2>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Account</h1>
+      <Card className="mt-6 max-w-sm p-5">
+        <div className="flex items-center gap-2">
+          <KeyRound size={16} className="text-slate-400" />
+          <h2 className="font-semibold text-slate-900">Change password</h2>
+        </div>
         <form onSubmit={onSubmit} className="mt-3 space-y-3">
           <div>
-            <label className="block text-xs font-medium text-slate-700">Current password</label>
+            <label className={labelClass}>Current password</label>
             <input
               type="password"
               required
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-700">New password</label>
+            <label className={labelClass}>New password</label>
             <input
               type="password"
               required
               minLength={8}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              className={inputClass}
             />
           </div>
           {message && (
-            <p className={`rounded-md px-3 py-2 text-sm ${message.type === "ok" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
+            <p
+              className={`rounded-lg px-3 py-2 text-sm ${message.type === "ok" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}
+            >
               {message.text}
             </p>
           )}
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-          >
+          <Button type="submit" disabled={saving}>
             {saving ? "Saving…" : "Update password"}
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }

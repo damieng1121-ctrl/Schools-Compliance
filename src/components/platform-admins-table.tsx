@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { UserCog } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
+import { inputClass, labelClass } from "@/components/ui/input";
 
 type Admin = {
   id: string;
@@ -42,61 +47,56 @@ export function PlatformAdminsTable({ initialAdmins }: { initialAdmins: Admin[] 
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 className="font-semibold text-slate-900">Add a platform admin</h2>
-        <p className="mt-1 text-sm text-slate-600">
+      <Card className="p-5">
+        <div className="flex items-center gap-2">
+          <UserCog size={16} className="text-slate-400" />
+          <h2 className="font-semibold text-slate-900">Add a platform admin</h2>
+        </div>
+        <p className="mt-1 text-sm text-slate-500">
           They can see and manage every school, just like you. They&apos;ll get an email with a temporary
           password.
         </p>
         <form onSubmit={addAdmin} className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end">
           <div>
-            <label className="block text-xs font-medium text-slate-700">Name</label>
-            <input
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-            />
+            <label className={labelClass}>Name</label>
+            <input required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-700">Email</label>
+            <label className={labelClass}>Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              className={inputClass}
             />
           </div>
-          <button
-            type="submit"
-            disabled={adding}
-            className="rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-          >
+          <Button type="submit" disabled={adding}>
             {adding ? "Adding…" : "Add admin"}
-          </button>
+          </Button>
         </form>
-        {error && <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-      </div>
+        {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      </Card>
 
-      <div className="rounded-xl border border-slate-200 bg-white">
+      <Card>
         <div className="border-b border-slate-100 px-5 py-3">
           <h2 className="font-semibold text-slate-900">Platform admins ({admins.length})</h2>
         </div>
         <div className="divide-y divide-slate-100">
           {admins.map((a) => (
-            <div key={a.id} className="flex items-center justify-between px-5 py-3">
-              <div>
-                <p className="text-sm font-medium text-slate-900">{a.name ?? a.email}</p>
-                <p className="text-xs text-slate-600">{a.email}</p>
+            <div key={a.id} className="flex items-center gap-3 px-5 py-3">
+              <Avatar name={a.name ?? a.email} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-slate-900">{a.name ?? a.email}</p>
+                <p className="truncate text-xs text-slate-500">{a.email}</p>
               </div>
-              <span className="text-xs text-slate-600">
+              <span className="shrink-0 text-xs text-slate-500">
                 Added {new Date(a.createdAt).toLocaleDateString("en-GB")}
               </span>
             </div>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

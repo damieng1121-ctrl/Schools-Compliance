@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { SuperAdminTenantsTable } from "@/components/super-admin-tenants-table";
+import { StatCard } from "@/components/ui/stat-card";
+import { Building2, CheckCircle2, XCircle, Gauge } from "lucide-react";
 
 export default async function SuperAdminPage() {
   const session = await auth();
@@ -40,28 +42,19 @@ export default async function SuperAdminPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">All schools</h1>
-      <p className="mt-1 text-sm text-slate-600">Every school on the platform, across all tenants.</p>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">All schools</h1>
+      <p className="mt-1 text-sm text-slate-500">Every school on the platform, across all tenants.</p>
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Stat label="Total schools" value={rows.length} />
-        <Stat label="Active" value={activeCount} />
-        <Stat label="Suspended" value={rows.length - activeCount} highlight={rows.length - activeCount > 0} />
-        <Stat label="Avg. readiness" value={`${avgReadiness}%`} />
+        <StatCard label="Total schools" value={rows.length} icon={Building2} />
+        <StatCard label="Active" value={activeCount} icon={CheckCircle2} tone="good" />
+        <StatCard label="Suspended" value={rows.length - activeCount} icon={XCircle} tone={rows.length - activeCount > 0 ? "bad" : "neutral"} />
+        <StatCard label="Avg. readiness" value={`${avgReadiness}%`} icon={Gauge} tone="brand" />
       </div>
 
       <div className="mt-6">
         <SuperAdminTenantsTable initialTenants={rows} />
       </div>
-    </div>
-  );
-}
-
-function Stat({ label, value, highlight }: { label: string; value: string | number; highlight?: boolean }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5">
-      <p className="text-sm text-slate-700">{label}</p>
-      <p className={`mt-1 text-3xl font-semibold ${highlight ? "text-red-600" : "text-slate-900"}`}>{value}</p>
     </div>
   );
 }

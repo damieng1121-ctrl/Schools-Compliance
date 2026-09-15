@@ -4,14 +4,17 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense, useState } from "react";
+import { ShieldCheck, ClipboardCheck, Mail } from "lucide-react";
 import { PlatformBadge } from "@/components/platform-badge";
+import { Button } from "@/components/ui/button";
+import { AuthShell, AuthPanel } from "@/components/auth-shell";
 
 function GoogleError() {
   const params = useSearchParams();
   const error = params.get("error");
   if (!error) return null;
   return (
-    <p className="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+    <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
       {error === "AccessDenied"
         ? "That Google account isn't set up for this dashboard. Ask your school's admin to add you first, or contact the platform team."
         : "Something went wrong signing you in with Google. Please try again."}
@@ -43,46 +46,39 @@ function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="mt-6 space-y-4 text-left">
       <div>
-        <label className="block text-xs font-medium text-slate-700">Email</label>
+        <label className="block text-xs font-medium text-slate-600">Email</label>
         <input
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100"
         />
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-700">Password</label>
+        <label className="block text-xs font-medium text-slate-600">Password</label>
         <input
           type="password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100"
         />
       </div>
-      {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-      >
+      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      <Button type="submit" disabled={loading} className="w-full">
         {loading ? "Signing in…" : "Sign in"}
-      </button>
+      </Button>
     </form>
   );
 }
 
 function GoogleSignInButton() {
   return (
-    <button
-      onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-      className="mt-4 flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-    >
+    <Button variant="secondary" onClick={() => signIn("google", { callbackUrl: "/dashboard" })} className="mt-4 w-full">
       <GoogleIcon />
       Sign in with Google
-    </button>
+    </Button>
   );
 }
 
@@ -111,32 +107,42 @@ function GoogleIcon() {
 
 export default function LoginPage() {
   return (
-    <div className="flex flex-1 items-center justify-center bg-slate-50 px-6 py-16">
-      <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto mb-4">
-          <PlatformBadge />
-        </div>
-        <h1 className="text-xl font-semibold text-slate-900">Sign in</h1>
-        <p className="mt-2 text-sm text-slate-600">Sign in to your school&apos;s compliance dashboard.</p>
-        <Suspense fallback={null}>
-          <LoginForm />
-        </Suspense>
-        <div className="mt-6 flex items-center gap-3 text-xs text-slate-500">
-          <div className="h-px flex-1 bg-slate-200" />
-          or
-          <div className="h-px flex-1 bg-slate-200" />
-        </div>
-        <GoogleSignInButton />
-        <Suspense fallback={null}>
-          <GoogleError />
-        </Suspense>
-        <p className="mt-6 text-sm text-slate-600">
-          No account yet?{" "}
-          <Link href="/signup" className="text-indigo-600 hover:underline">
-            Set up your school
-          </Link>
-        </p>
+    <AuthShell
+      panel={
+        <AuthPanel
+          title="Sign in to your dashboard"
+          description="Track readiness against the DfE digital & technology standards, keep evidence in one place, and report progress with a click."
+          points={[
+            { icon: ShieldCheck, text: "12 standards, 41 checkpoints — all in one place" },
+            { icon: ClipboardCheck, text: "Evidence, notes, and review dates per item" },
+            { icon: Mail, text: "Email yourself a progress report any time" },
+          ]}
+        />
+      }
+    >
+      <div className="mx-auto mb-4 lg:hidden">
+        <PlatformBadge />
       </div>
-    </div>
+      <h1 className="text-xl font-bold tracking-tight text-slate-900">Sign in</h1>
+      <p className="mt-1.5 text-sm text-slate-500">Sign in to your school&apos;s compliance dashboard.</p>
+      <Suspense fallback={null}>
+        <LoginForm />
+      </Suspense>
+      <div className="mt-6 flex items-center gap-3 text-xs font-medium text-slate-400">
+        <div className="h-px flex-1 bg-slate-200" />
+        or
+        <div className="h-px flex-1 bg-slate-200" />
+      </div>
+      <GoogleSignInButton />
+      <Suspense fallback={null}>
+        <GoogleError />
+      </Suspense>
+      <p className="mt-6 text-sm text-slate-500">
+        No account yet?{" "}
+        <Link href="/signup" className="font-medium text-red-600 hover:underline">
+          Set up your school
+        </Link>
+      </p>
+    </AuthShell>
   );
 }
