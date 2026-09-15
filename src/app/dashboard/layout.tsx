@@ -12,7 +12,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
   const tenant = session.user.tenantId
     ? await prisma.tenant.findUnique({
         where: { id: session.user.tenantId },
-        select: { name: true },
+        select: { name: true, logoUrl: true },
       })
     : null;
 
@@ -20,6 +20,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
     <div className="flex min-h-screen flex-1">
       <DashboardNav
         tenantName={isSuperAdmin ? "Platform admin" : (tenant?.name ?? "Your school")}
+        tenantLogoUrl={tenant?.logoUrl}
         userName={session.user.name ?? session.user.email ?? "Account"}
         isAdmin={session.user.role === "ADMIN"}
         isSuperAdmin={isSuperAdmin}

@@ -58,7 +58,7 @@ export default function SignupPage() {
               value={schoolName}
               onChange={(e) => setSchoolName(e.target.value)}
               className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-              placeholder="Willowbrook Primary School"
+              placeholder="Enter school name here"
             />
           </div>
           <div>

@@ -17,6 +17,12 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
   const [tenants, setTenants] = useState(initialTenants);
   const [pendingId, setPendingId] = useState<string | null>(null);
 
+  const [schoolName, setSchoolName] = useState("");
+  const [adminName, setAdminName] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+
   async function toggleActive(tenant: TenantRow) {
     const nextActive = !tenant.isActive;
     setPendingId(tenant.id);
@@ -33,8 +39,79 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
     }
   }
 
+  async function addSchool(e: React.FormEvent) {
+    e.preventDefault();
+    setAdding(true);
+    setAddError(null);
+    try {
+      const res = await fetch("/api/super-admin/tenants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ schoolName, adminName, adminEmail }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setAddError(body.error ?? "Something went wrong.");
+        return;
+      }
+      setTenants((prev) => [body, ...prev]);
+      setSchoolName("");
+      setAdminName("");
+      setAdminEmail("");
+    } finally {
+      setAdding(false);
+    }
+  }
+
   return (
-    <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+    <div className="space-y-6">
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <h2 className="font-semibold text-slate-900">Add a school</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Creates the school and its first admin, who gets emailed a temporary password.
+        </p>
+        <form onSubmit={addSchool} className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-4 sm:items-end">
+          <div className="sm:col-span-1">
+            <label className="block text-xs font-medium text-slate-700">School name</label>
+            <input
+              required
+              value={schoolName}
+              onChange={(e) => setSchoolName(e.target.value)}
+              placeholder="Enter school name here"
+              className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            />
+          </div>
+          <div className="sm:col-span-1">
+            <label className="block text-xs font-medium text-slate-700">Admin name</label>
+            <input
+              required
+              value={adminName}
+              onChange={(e) => setAdminName(e.target.value)}
+              className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            />
+          </div>
+          <div className="sm:col-span-1">
+            <label className="block text-xs font-medium text-slate-700">Admin email</label>
+            <input
+              type="email"
+              required
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
+              className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={adding}
+            className="rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 sm:col-span-1"
+          >
+            {adding ? "Adding…" : "Add school"}
+          </button>
+        </form>
+        {addError && <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{addError}</p>}
+      </div>
+
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
       <table className="w-full text-left text-sm">
         <thead className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-600">
           <tr>
@@ -95,6 +172,7 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

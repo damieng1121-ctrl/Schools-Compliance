@@ -2,6 +2,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { slugify } from "@/lib/slugify";
 
 const bodySchema = z.object({
   schoolName: z.string().trim().min(2).max(200),
@@ -9,15 +10,6 @@ const bodySchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   password: z.string().min(8).max(200),
 });
-
-function slugify(name: string): string {
-  const base = name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return base || "school";
-}
 
 /** Self-service signup: creates a new tenant (school) and its first ADMIN user in one step. */
 export async function POST(req: Request) {

@@ -3,24 +3,27 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { ShieldCheck, LayoutDashboard, Users, LogOut, UserCircle, Building2 } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, Users, LogOut, UserCircle, Building2, Settings } from "lucide-react";
 import clsx from "clsx";
 
 const LINKS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, tenantOnly: true },
   { href: "/dashboard/compliance", label: "Digital standards", icon: ShieldCheck, tenantOnly: true },
   { href: "/dashboard/team", label: "Team", icon: Users, tenantOnly: true, adminOnly: true },
+  { href: "/dashboard/settings", label: "School settings", icon: Settings, tenantOnly: true, adminOnly: true },
   { href: "/dashboard/super-admin", label: "All schools", icon: Building2, superAdminOnly: true },
   { href: "/dashboard/account", label: "Account", icon: UserCircle },
 ];
 
 export function DashboardNav({
   tenantName,
+  tenantLogoUrl,
   userName,
   isAdmin,
   isSuperAdmin,
 }: {
   tenantName: string;
+  tenantLogoUrl?: string | null;
   userName: string;
   isAdmin: boolean;
   isSuperAdmin: boolean;
@@ -38,9 +41,14 @@ export function DashboardNav({
     <nav className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
       <div className="border-b border-slate-100 px-5 py-5">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-semibold text-white">
-            SC
-          </div>
+          {tenantLogoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- external, per-tenant source; next/image's domain allowlist doesn't fit here
+            <img src={tenantLogoUrl} alt="" className="h-8 w-8 rounded-lg object-contain" />
+          ) : (
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-semibold text-white">
+              SC
+            </div>
+          )}
           <span className="font-semibold text-slate-900">Schools Compliance</span>
         </div>
         <p className="mt-2 truncate text-xs text-slate-600">{tenantName}</p>

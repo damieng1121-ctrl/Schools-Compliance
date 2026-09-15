@@ -27,6 +27,8 @@ model Tenant {
   slug      String   @unique
   /// DfE unique reference number for the school, if provided
   urn       String?
+  /// URL to the school's own logo, shown in place of the platform badge once set.
+  logoUrl   String?
   timezone  String   @default("Europe/London")
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
