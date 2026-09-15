@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { ShieldCheck, LayoutDashboard, Users, LogOut, UserCircle, Building2, Settings } from "lucide-react";
 import clsx from "clsx";
+import { PlatformBadge } from "@/components/platform-badge";
 
 const LINKS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, tenantOnly: true },
@@ -45,9 +46,7 @@ export function DashboardNav({
             // eslint-disable-next-line @next/next/no-img-element -- external, per-tenant source; next/image's domain allowlist doesn't fit here
             <img src={tenantLogoUrl} alt="" className="h-8 w-8 rounded-lg object-contain" />
           ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-semibold text-white">
-              SC
-            </div>
+            <PlatformBadge size={32} />
           )}
           <span className="font-semibold text-slate-900">Schools Compliance</span>
         </div>

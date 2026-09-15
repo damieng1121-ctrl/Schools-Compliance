@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense, useState } from "react";
+import { PlatformBadge } from "@/components/platform-badge";
 
 function GoogleError() {
   const params = useSearchParams();
@@ -112,8 +113,8 @@ export default function LoginPage() {
   return (
     <div className="flex flex-1 items-center justify-center bg-slate-50 px-6 py-16">
       <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 font-semibold text-white">
-          SC
+        <div className="mx-auto mb-4">
+          <PlatformBadge />
         </div>
         <h1 className="text-xl font-semibold text-slate-900">Sign in</h1>
         <p className="mt-2 text-sm text-slate-600">Sign in to your school&apos;s compliance dashboard.</p>

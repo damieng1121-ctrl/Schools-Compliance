@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { PlatformBadge } from "@/components/platform-badge";
 
 export default async function HomePage() {
   const session = await auth();
@@ -8,8 +9,8 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-slate-50 px-6 py-20 text-center">
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 font-semibold text-white">
-        SC
+      <div className="mx-auto mb-4">
+        <PlatformBadge size={48} />
       </div>
       <h1 className="max-w-xl text-3xl font-semibold text-slate-900">
         Track your school&apos;s readiness against the DfE digital &amp; technology standards
