@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 type TenantRow = {
   id: string;
@@ -129,7 +130,9 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
             return (
               <tr key={t.id}>
                 <td className="px-5 py-3">
-                  <p className="font-medium text-slate-900">{t.name}</p>
+                  <Link href={`/dashboard/super-admin/${t.id}`} className="font-medium text-slate-900 hover:text-indigo-600 hover:underline">
+                    {t.name}
+                  </Link>
                   <p className="text-xs text-slate-600">{t.slug}</p>
                 </td>
                 <td className="px-5 py-3 text-slate-700">{t.userCount}</td>
@@ -152,13 +155,21 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
                 </td>
                 <td className="px-5 py-3 text-slate-700">{new Date(t.createdAt).toLocaleDateString("en-GB")}</td>
                 <td className="px-5 py-3 text-right">
-                  <button
-                    onClick={() => toggleActive(t)}
-                    disabled={pendingId === t.id}
-                    className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-                  >
-                    {pendingId === t.id ? "Saving…" : t.isActive ? "Suspend" : "Reactivate"}
-                  </button>
+                  <div className="flex justify-end gap-2">
+                    <Link
+                      href={`/dashboard/super-admin/${t.id}`}
+                      className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      Manage
+                    </Link>
+                    <button
+                      onClick={() => toggleActive(t)}
+                      disabled={pendingId === t.id}
+                      className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      {pendingId === t.id ? "Saving…" : t.isActive ? "Suspend" : "Reactivate"}
+                    </button>
+                  </div>
                 </td>
               </tr>
             );

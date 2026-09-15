@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { ShieldCheck, LayoutDashboard, Users, LogOut, UserCircle, Building2, Settings } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, Users, LogOut, UserCircle, Building2, Settings, UserCog } from "lucide-react";
 import clsx from "clsx";
 import { PlatformBadge } from "@/components/platform-badge";
 
@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/dashboard/team", label: "Team", icon: Users, tenantOnly: true, adminOnly: true },
   { href: "/dashboard/settings", label: "School settings", icon: Settings, tenantOnly: true, adminOnly: true },
   { href: "/dashboard/super-admin", label: "All schools", icon: Building2, superAdminOnly: true },
+  { href: "/dashboard/super-admin/admins", label: "Platform admins", icon: UserCog, superAdminOnly: true },
   { href: "/dashboard/account", label: "Account", icon: UserCircle },
 ];
 
