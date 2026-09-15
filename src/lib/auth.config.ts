@@ -6,6 +6,10 @@ import type { NextAuthConfig } from "next-auth";
  * full config with the credentials provider lives in src/lib/auth.ts.
  */
 export const authConfig = {
+  // Required behind any reverse proxy (Cloud Run, Vercel, etc.) — without
+  // it Auth.js rejects the proxied request's host header and every auth
+  // route 500s with a generic "server configuration" error.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
