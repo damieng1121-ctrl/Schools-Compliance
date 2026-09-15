@@ -1,9 +1,14 @@
 import Link from "next/link";
-import { requireSession } from "@/lib/session";
+import { redirect } from "next/navigation";
+import { requireTenantSession } from "@/lib/session";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export default async function DashboardOverviewPage() {
-  const session = await requireSession();
+  const rawSession = await auth();
+  if (rawSession?.user.role === "SUPER_ADMIN") redirect("/dashboard/super-admin");
+
+  const session = await requireTenantSession();
 
   const [standards, assessments] = await Promise.all([
     prisma.complianceStandard.findMany({ include: { items: true } }),

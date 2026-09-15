@@ -1,4 +1,4 @@
-import { requireSession, AuthError } from "@/lib/session";
+import { requireTenantSession, AuthError } from "@/lib/session";
 import { withApiErrors } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { getNotificationProvider } from "@/lib/notifications";
@@ -14,7 +14,7 @@ const STATUS_LABEL: Record<string, string> = {
 /** Emails the current DfE compliance report to the requesting user's own address. */
 export async function POST() {
   return withApiErrors(async () => {
-    const session = await requireSession();
+    const session = await requireTenantSession();
     const recipientEmail = session.user.email;
     if (!recipientEmail) throw new AuthError("Your account has no email address on file", 400);
 

@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { ShieldCheck, LayoutDashboard, Users, LogOut, UserCircle } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, Users, LogOut, UserCircle, Building2 } from "lucide-react";
 import clsx from "clsx";
 
 const LINKS = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/compliance", label: "Digital standards", icon: ShieldCheck },
-  { href: "/dashboard/team", label: "Team", icon: Users, adminOnly: true },
+  { href: "/dashboard", label: "Overview", icon: LayoutDashboard, tenantOnly: true },
+  { href: "/dashboard/compliance", label: "Digital standards", icon: ShieldCheck, tenantOnly: true },
+  { href: "/dashboard/team", label: "Team", icon: Users, tenantOnly: true, adminOnly: true },
+  { href: "/dashboard/super-admin", label: "All schools", icon: Building2, superAdminOnly: true },
   { href: "/dashboard/account", label: "Account", icon: UserCircle },
 ];
 
@@ -17,12 +18,21 @@ export function DashboardNav({
   tenantName,
   userName,
   isAdmin,
+  isSuperAdmin,
 }: {
   tenantName: string;
   userName: string;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
 }) {
   const pathname = usePathname();
+
+  const links = LINKS.filter((l) => {
+    if (l.superAdminOnly) return isSuperAdmin;
+    if (l.tenantOnly && isSuperAdmin) return false;
+    if (l.adminOnly && !isAdmin) return false;
+    return true;
+  });
 
   return (
     <nav className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
@@ -36,7 +46,7 @@ export function DashboardNav({
         <p className="mt-2 truncate text-xs text-slate-600">{tenantName}</p>
       </div>
       <div className="flex-1 space-y-1 px-3 py-4">
-        {LINKS.filter((l) => !l.adminOnly || isAdmin).map((link) => {
+        {links.map((link) => {
           const Icon = link.icon;
           const active = pathname === link.href;
           return (

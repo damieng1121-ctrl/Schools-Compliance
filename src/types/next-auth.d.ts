@@ -6,7 +6,8 @@ declare module "next-auth" {
     user: {
       id: string;
       role: Role;
-      tenantId: string;
+      /// Null for SUPER_ADMIN, who belongs to no single school.
+      tenantId: string | null;
     } & DefaultSession["user"];
   }
 }
@@ -18,6 +19,6 @@ declare module "@auth/core/jwt" {
   interface JWT {
     id: string;
     role: Role;
-    tenantId: string;
+    tenantId: string | null;
   }
 }

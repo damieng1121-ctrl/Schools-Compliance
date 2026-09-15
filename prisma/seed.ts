@@ -417,11 +417,27 @@ async function seedDemoTenant() {
   console.log("Seeded demo tenant (admin@demo-school.example / password123).");
 }
 
+/** Creates (or updates the password of) a platform SUPER_ADMIN — belongs to no tenant, can see every school. Only runs when both env vars are set, so it's safe to leave in production seeding. */
+async function seedSuperAdmin() {
+  const email = process.env.SUPER_ADMIN_EMAIL?.toLowerCase().trim();
+  const password = process.env.SUPER_ADMIN_PASSWORD;
+  if (!email || !password) return;
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  await prisma.user.upsert({
+    where: { email },
+    create: { email, name: "Super Admin", passwordHash, role: "SUPER_ADMIN", tenantId: null },
+    update: { passwordHash, role: "SUPER_ADMIN", tenantId: null },
+  });
+  console.log(`Seeded super admin (${email}).`);
+}
+
 async function main() {
   await seedComplianceCatalogue();
   if (process.env.SEED_DEMO_TENANT === "true") {
     await seedDemoTenant();
   }
+  await seedSuperAdmin();
 }
 
 main()

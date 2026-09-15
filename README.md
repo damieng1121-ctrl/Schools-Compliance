@@ -38,13 +38,22 @@ its first `ADMIN` user), or `/login` to sign in.
 To also seed a demo tenant (`admin@demo-school.example` / `password123`), set
 `SEED_DEMO_TENANT=true` before running `npm run db:seed`.
 
+To create a platform super admin (can see every school from
+`/dashboard/super-admin`, suspend/reactivate tenants), set
+`SUPER_ADMIN_EMAIL`/`SUPER_ADMIN_PASSWORD` before running `npm run db:seed`
+— safe to leave set in production, it only ever touches that one account.
+There's no public signup path to this role; it only ever comes from the seed
+script.
+
 ## Data model
 
 - **Tenant** — one school. Every tenant-scoped table carries a `tenantId` and
-  must be queried through `requireSession()` (`src/lib/session.ts`), never a
-  client-supplied tenant id.
-- **User** — belongs to exactly one tenant, with role `ADMIN` (manages team +
-  settings) or `MEMBER` (views/edits the checklist).
+  must be queried through `requireTenantSession()` (`src/lib/session.ts`),
+  never a client-supplied tenant id.
+- **User** — role `SUPER_ADMIN` (platform staff, `tenantId` null, sees every
+  school), `ADMIN` (manages their school's team + settings), or `MEMBER`
+  (views/edits their school's checklist). ADMIN/MEMBER always belong to
+  exactly one tenant.
 - **ComplianceStandard** / **ComplianceItem** — a shared, global catalogue of
   the DfE standards (seeded from `prisma/seed.ts`), not tenant-scoped.
 - **ComplianceAssessment** — one row per tenant per item: status, evidence,

@@ -18,8 +18,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = typeof credentials?.password === "string" ? credentials.password : undefined;
         if (!email || !password) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({ where: { email }, include: { tenant: true } });
         if (!user || !user.isActive) return null;
+        // A suspended school's users can't sign in, even with a correct password.
+        if (user.tenant && !user.tenant.isActive) return null;
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;

@@ -1,4 +1,4 @@
-import { requireSession } from "@/lib/session";
+import { requireTenantSession } from "@/lib/session";
 import { withApiErrors } from "@/lib/api";
 import { prisma } from "@/lib/db";
 
@@ -9,7 +9,7 @@ import { prisma } from "@/lib/db";
  */
 export async function GET() {
   return withApiErrors(async () => {
-    const session = await requireSession();
+    const session = await requireTenantSession();
 
     const [standards, assessments] = await Promise.all([
       prisma.complianceStandard.findMany({

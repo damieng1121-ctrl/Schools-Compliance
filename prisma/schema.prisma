@@ -38,14 +38,16 @@ model Tenant {
 }
 
 enum Role {
+  SUPER_ADMIN // Platform staff, cross-tenant — belongs to no single school
   ADMIN // Can manage users/settings and edit assessments
   MEMBER // Can view and edit assessments
 }
 
 model User {
-  id       String @id @default(cuid())
-  tenantId String
-  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id       String  @id @default(cuid())
+  /// Null only for SUPER_ADMIN — every ADMIN/MEMBER belongs to exactly one school.
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   email        String  @unique
   name         String?

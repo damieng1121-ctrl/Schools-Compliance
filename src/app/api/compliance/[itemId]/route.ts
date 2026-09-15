@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { requireSession, AuthError } from "@/lib/session";
+import { requireTenantSession, AuthError } from "@/lib/session";
 import { withApiErrors } from "@/lib/api";
 import { prisma } from "@/lib/db";
 
@@ -14,7 +14,7 @@ const bodySchema = z.object({
 
 export async function PUT(req: Request, { params }: Params) {
   return withApiErrors(async () => {
-    const session = await requireSession();
+    const session = await requireTenantSession();
     const { itemId } = await params;
     const item = await prisma.complianceItem.findUnique({ where: { id: itemId } });
     if (!item) throw new AuthError("Compliance item not found", 404);

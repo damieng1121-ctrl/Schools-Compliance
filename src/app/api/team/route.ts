@@ -1,14 +1,14 @@
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
-import { requireSession, AuthError } from "@/lib/session";
+import { requireTenantSession, AuthError } from "@/lib/session";
 import { withApiErrors } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { getNotificationProvider } from "@/lib/notifications";
 
 export async function GET() {
   return withApiErrors(async () => {
-    const session = await requireSession();
+    const session = await requireTenantSession();
     return prisma.user.findMany({
       where: { tenantId: session.user.tenantId },
       select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true },
@@ -26,7 +26,7 @@ const bodySchema = z.object({
 /** Admin-only: invites a colleague by creating their account with a random temporary password, emailed to them. */
 export async function POST(req: Request) {
   return withApiErrors(async () => {
-    const session = await requireSession();
+    const session = await requireTenantSession();
     if (session.user.role !== "ADMIN") throw new AuthError("Only admins can add team members", 403);
 
     const { name, email, role } = bodySchema.parse(await req.json());
