@@ -14,7 +14,8 @@ their records.
 
 - Next.js 16 (App Router) + TypeScript
 - PostgreSQL via Prisma
-- Auth.js (NextAuth v5) with email/password credentials, JWT sessions
+- Auth.js (NextAuth v5) with email/password credentials, JWT sessions, and
+  optional Google sign-in
 - Tailwind CSS
 - Outbound email via SMTP (nodemailer) — falls back to console logging in dev
 
@@ -44,6 +45,14 @@ To create a platform super admin (can see every school from
 — safe to leave set in production, it only ever touches that one account.
 There's no public signup path to this role; it only ever comes from the seed
 script.
+
+To enable "Sign in with Google" alongside email/password, set
+`AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET` (from a Google Cloud OAuth client — see
+`DEPLOY.md`) and `GOOGLE_SSO_ALLOWED_DOMAINS` (comma-separated). It never
+auto-creates accounts: a Google sign-in only succeeds for an email that's
+both on an allowed domain and already has a `User` row (created via
+`/signup` or the Team page) — Google just replaces the password step for
+that existing account.
 
 ## Data model
 

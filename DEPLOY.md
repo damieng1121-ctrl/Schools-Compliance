@@ -57,7 +57,17 @@ echo -n "$(npx auth secret --raw 2>/dev/null || openssl rand -base64 32)" | \
 (Repeat for `SMTP_HOST`/`SMTP_USER`/`SMTP_PASS` if you're wiring up email —
 otherwise team invites and "email me this report" just log to the server
 console instead of sending, which is harmless but not useful in
-production.)
+production. See "Gmail SMTP" below for where `SMTP_USER`/`SMTP_PASS` come
+from if you're sending via a Google Workspace mailbox.)
+
+Cloud Run's default service account needs permission to read these secrets
+— grant it once (project-wide is simplest for a project this size):
+
+```bash
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="serviceAccount:$(gcloud projects describe YOUR_PROJECT_ID --format='value(projectNumber)')-compute@developer.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+```
 
 ## 4. Deploy
 
@@ -97,6 +107,50 @@ npm run db:seed   # seeds the DfE standards catalogue
 
 Set `SUPER_ADMIN_EMAIL`/`SUPER_ADMIN_PASSWORD` in your local `.env` before
 seeding if you want a platform super admin created at the same time.
+
+## Optional: Google sign-in
+
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials) →
+   **APIs & Services → OAuth consent screen** — set it up for "Internal" (if
+   this is a Google Workspace org) or "External" with your domain(s) as
+   authorized. App name/logo don't matter functionally.
+2. **APIs & Services → Credentials → Create Credentials → OAuth client ID**,
+   type "Web application".
+   - **Authorized redirect URI**: `https://YOUR_RUN_APP_URL/api/auth/callback/google`
+     (use the real Cloud Run URL from step 4 above — add it again after a
+     custom domain if you attach one).
+3. Copy the generated Client ID and Client Secret:
+   ```bash
+   echo -n "your-client-id.apps.googleusercontent.com" | gcloud secrets create AUTH_GOOGLE_ID --data-file=-
+   echo -n "your-client-secret" | gcloud secrets create AUTH_GOOGLE_SECRET --data-file=-
+   ```
+4. Redeploy with the new secrets plus the allowed-domains env var:
+   ```bash
+   gcloud run deploy schools-compliance \
+     --image europe-west2-docker.pkg.dev/YOUR_PROJECT_ID/schools-compliance/app:latest \
+     --region europe-west2 \
+     --update-secrets AUTH_GOOGLE_ID=AUTH_GOOGLE_ID:latest,AUTH_GOOGLE_SECRET=AUTH_GOOGLE_SECRET:latest \
+     --update-env-vars GOOGLE_SSO_ALLOWED_DOMAINS=education-lincs.com
+   ```
+
+Google sign-in never auto-creates accounts — see README for how the domain
+allowlist + existing-account check work together.
+
+## Gmail SMTP (sending as a Google Workspace mailbox)
+
+1. Sign in to the sending mailbox (e.g. `helpdesk@education-lincs.com`) at
+   [myaccount.google.com](https://myaccount.google.com).
+2. **Security → 2-Step Verification** — must be on first.
+3. **Security → App passwords** ([myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords))
+   — create one, copy the 16-character password.
+4. That's `SMTP_PASS`; `SMTP_USER` is the mailbox address. Use
+   `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_SECURE=false`.
+
+If "App passwords" is missing/greyed out, your Workspace admin has disabled
+them org-wide — ask them to either enable app passwords for this account or
+allowlist Cloud Run's egress via Workspace's SMTP relay service instead
+(`smtp-relay.gmail.com`, no per-account password, but needs an IP
+allowlist).
 
 ## Redeploying after a code change
 
