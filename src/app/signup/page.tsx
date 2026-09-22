@@ -115,6 +115,17 @@ export default function SignupPage() {
           Sign in
         </Link>
       </p>
+      <p className="mt-3 text-xs text-slate-400">
+        By creating an account you agree to our{" "}
+        <Link href="/terms" className="hover:text-slate-600 hover:underline">
+          Terms
+        </Link>{" "}
+        and{" "}
+        <Link href="/privacy" className="hover:text-slate-600 hover:underline">
+          Privacy policy
+        </Link>
+        .
+      </p>
     </AuthShell>
   );
 }

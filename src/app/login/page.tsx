@@ -143,6 +143,15 @@ export default function LoginPage() {
           Set up your school
         </Link>
       </p>
+      <p className="mt-4 text-xs text-slate-400">
+        <Link href="/privacy" className="hover:text-slate-600 hover:underline">
+          Privacy
+        </Link>{" "}
+        &middot;{" "}
+        <Link href="/terms" className="hover:text-slate-600 hover:underline">
+          Terms
+        </Link>
+      </p>
     </AuthShell>
   );
 }

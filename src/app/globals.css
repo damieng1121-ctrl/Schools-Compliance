@@ -32,3 +32,34 @@ body {
 .animate-fade-in {
   animation: fade-in 0.25s ease-out;
 }
+
+.legal-prose h2 {
+  margin-top: 2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.legal-prose h2:first-child {
+  margin-top: 0;
+}
+
+.legal-prose ul {
+  margin-top: 0.5rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.legal-prose li {
+  margin-top: 0.25rem;
+}
+
+.legal-prose li > strong {
+  color: #0f172a;
+}
+
+.legal-prose a {
+  color: #0f172a;
+  font-weight: 500;
+  text-decoration: underline;
+}
