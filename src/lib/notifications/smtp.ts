@@ -3,12 +3,14 @@ import type { EmailMessage, NotificationProvider } from "./types";
 
 /**
  * SMTP-backed notification provider. Deliberately only ever calls
- * `sendMail` with plain `to`/`subject`/`text` — never the `raw` option,
- * which has an unpatched advisory allowing it to read local files / hit
- * arbitrary URLs even with `disableFileAccess`/`disableUrlAccess` set
- * (https://github.com/advisories/GHSA-p6gq-j5cr-w38f). Those two flags are
- * still set below as defense-in-depth against the (non-`raw`) attachment
- * path/URL vectors, which they do cover.
+ * `sendMail` with plain `to`/`subject`/`text`/`html` fields — never the
+ * `raw` option, which has an unpatched advisory allowing it to read local
+ * files / hit arbitrary URLs even with `disableFileAccess`/
+ * `disableUrlAccess` set (https://github.com/advisories/GHSA-p6gq-j5cr-w38f).
+ * Those two flags are still set below as defense-in-depth against the
+ * (non-`raw`) attachment path/URL vectors, which they do cover. Callers are
+ * responsible for HTML-escaping any user-supplied text before it reaches
+ * `html` here — this class doesn't sanitize it.
  */
 export class SmtpNotificationProvider implements NotificationProvider {
   readonly name = "smtp" as const;
@@ -33,6 +35,7 @@ export class SmtpNotificationProvider implements NotificationProvider {
       to: message.to,
       subject: message.subject,
       text: message.text,
+      html: message.html,
     });
   }
 }
