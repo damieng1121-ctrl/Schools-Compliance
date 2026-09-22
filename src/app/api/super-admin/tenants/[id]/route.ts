@@ -36,6 +36,8 @@ const bodySchema = z.object({
   name: z.string().trim().min(2).max(200).optional(),
   urn: z.string().trim().max(50).optional().or(z.literal("")),
   logoUrl: z.string().url().optional().or(z.literal("")),
+  dslName: z.string().trim().max(200).optional().or(z.literal("")),
+  dslEmail: z.string().trim().email().optional().or(z.literal("")),
 });
 
 /** Edit a school's details and/or suspend/reactivate it — SUPER_ADMIN only. Suspended tenants keep their data but their users can no longer sign in. */
@@ -54,6 +56,8 @@ export async function PATCH(req: Request, { params }: Params) {
         ...(body.name !== undefined && { name: body.name }),
         ...(body.urn !== undefined && { urn: body.urn || null }),
         ...(body.logoUrl !== undefined && { logoUrl: body.logoUrl || null }),
+        ...(body.dslName !== undefined && { dslName: body.dslName || null }),
+        ...(body.dslEmail !== undefined && { dslEmail: body.dslEmail || null }),
       },
     });
 

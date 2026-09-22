@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { inputClass, labelClass } from "@/components/ui/input";
 import { ComplianceReadOnly } from "@/components/compliance-readonly";
+import { FilteringChecksList } from "@/components/filtering-checks-list";
 
 type Member = {
   id: string;
@@ -24,6 +25,8 @@ type SchoolDetail = {
   slug: string;
   urn: string | null;
   logoUrl: string | null;
+  dslName: string | null;
+  dslEmail: string | null;
   isActive: boolean;
   users: Member[];
   totalItems: number;
@@ -37,6 +40,8 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
   const [name, setName] = useState("");
   const [urn, setUrn] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
+  const [dslName, setDslName] = useState("");
+  const [dslEmail, setDslEmail] = useState("");
   const [savingDetails, setSavingDetails] = useState(false);
   const [detailsMessage, setDetailsMessage] = useState<{ type: "ok" | "error"; text: string } | null>(null);
   const [togglingActive, setTogglingActive] = useState(false);
@@ -58,6 +63,8 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
         setName(t.name);
         setUrn(t.urn ?? "");
         setLogoUrl(t.logoUrl ?? "");
+        setDslName(t.dslName ?? "");
+        setDslEmail(t.dslEmail ?? "");
       })
       .catch(() => setNotFound(true));
   }
@@ -72,7 +79,7 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
       const res = await fetch(`/api/super-admin/tenants/${tenantId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, urn, logoUrl }),
+        body: JSON.stringify({ name, urn, logoUrl, dslName, dslEmail }),
       });
       const body = await res.json();
       if (!res.ok) {
@@ -175,6 +182,24 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
                 className={inputClass}
               />
             </div>
+            <div className="border-t border-slate-100 pt-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Designated Safeguarding Lead</p>
+              <p className="mt-1 text-xs text-slate-500">Filtering &amp; Monitoring check reports get emailed here.</p>
+            </div>
+            <div>
+              <label className={labelClass}>DSL name (optional)</label>
+              <input value={dslName} onChange={(e) => setDslName(e.target.value)} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>DSL email</label>
+              <input
+                type="email"
+                value={dslEmail}
+                onChange={(e) => setDslEmail(e.target.value)}
+                placeholder="dsl@school.example"
+                className={inputClass}
+              />
+            </div>
             {detailsMessage && (
               <p
                 className={`rounded-lg px-3 py-2 text-sm ${
@@ -258,6 +283,10 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
 
       <div className="mt-6">
         <ComplianceReadOnly tenantId={tenantId} />
+      </div>
+
+      <div className="mt-6">
+        <FilteringChecksList tenantId={tenantId} hasDslEmail={!!school.dslEmail} />
       </div>
     </div>
   );

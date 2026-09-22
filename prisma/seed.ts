@@ -366,6 +366,64 @@ const STANDARDS = [
   },
 ];
 
+/**
+ * The Filtering & Monitoring visit checklist — the same 7 checks a
+ * technician runs against every device/user/location tested during a
+ * visit (staff laptop, student login, guest network, BYOD, etc.).
+ */
+const FILTERING_CHECK_ITEMS = [
+  {
+    code: "categories-blocked",
+    title: "Are expected categories blocked?",
+    guidance:
+      "Try an obviously inappropriate but harmless site like guinness.com to show filtering is active (if the alcohol category is blocked).",
+  },
+  {
+    code: "block-page-policy",
+    title: "Block page shows the correct policy",
+    guidance:
+      "While on the block page, click to see more information and double check you are on the correct policy, e.g. student policy for a student login (if your provider does not have this on the block page, ask how you can test this).",
+  },
+  {
+    code: "illegal-content-blocked",
+    title: "Illegal content is blocked",
+    guidance:
+      "Check illegal sites are blocked using the Safer Internet Centre's testfiltering.com (select the green school, then the blue \"run filtering test\" button).",
+  },
+  {
+    code: "youtube-restricted-mode",
+    title: "YouTube restricted mode",
+    guidance: "Check YouTube is on one of the two restricted modes via youtubemode.lgfl.net (find out more at youtube.lgfl.net).",
+  },
+  {
+    code: "safe-search-enforced",
+    title: "Safe Search is enforced",
+    guidance: "Check Safe Search is on and enforced for all search engines you use, and check it can't be turned off.",
+  },
+  {
+    code: "recent-access-issues",
+    title: "Recent access issues followed up",
+    guidance:
+      "Ask if the school has recently not been able to access educational sites, or stumbled across inappropriate sites (and get them un/blocked). Remind them to report promptly in future.",
+  },
+  {
+    code: "bypass-concerns",
+    title: "Concerns about bypassing blocks?",
+    guidance: "Ask if there are any concerns about students bypassing filtering (e.g. VPNs, proxy sites).",
+  },
+];
+
+async function seedFilteringCheckCatalogue() {
+  for (const [order, item] of FILTERING_CHECK_ITEMS.entries()) {
+    await prisma.filteringCheckItem.upsert({
+      where: { code: item.code },
+      create: { ...item, order },
+      update: { ...item, order },
+    });
+  }
+  console.log(`Seeded ${FILTERING_CHECK_ITEMS.length} Filtering & Monitoring check items.`);
+}
+
 async function seedComplianceCatalogue() {
   for (const [standardOrder, standard] of STANDARDS.entries()) {
     const created = await prisma.complianceStandard.upsert({
@@ -434,6 +492,7 @@ async function seedSuperAdmin() {
 
 async function main() {
   await seedComplianceCatalogue();
+  await seedFilteringCheckCatalogue();
   if (process.env.SEED_DEMO_TENANT === "true") {
     await seedDemoTenant();
   }

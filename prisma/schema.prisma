@@ -31,12 +31,16 @@ model Tenant {
   logoUrl   String?
   timezone  String   @default("Europe/London")
   isActive  Boolean  @default(true)
+  /// Designated Safeguarding Lead — who Filtering & Monitoring check reports get emailed to.
+  dslName   String?
+  dslEmail  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users       User[]
-  assessments ComplianceAssessment[]
-  auditLogs   AuditLog[]
+  users           User[]
+  assessments     ComplianceAssessment[]
+  filteringChecks FilteringCheck[]
+  auditLogs       AuditLog[]
 }
 
 enum Role {
@@ -60,8 +64,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  assessmentsReviewed ComplianceAssessment[]
-  auditLogs           AuditLog[]
+  assessmentsReviewed      ComplianceAssessment[]
+  filteringChecksPerformed FilteringCheck[]
+  auditLogs                AuditLog[]
 
   @@index([tenantId])
 }
@@ -140,6 +145,80 @@ model ComplianceAssessment {
 
   @@unique([tenantId, itemId])
   @@index([tenantId, status])
+}
+
+// ---------------------------------------------------------------------------
+// Filtering & Monitoring checks — technicians (currently: SUPER_ADMIN users)
+// log a visit against a school, testing one or more devices/user types
+// against a fixed set of checks, then can email the report to the school's
+// Designated Safeguarding Lead (Tenant.dslEmail).
+//
+// FilteringCheckItem is a small global catalogue (seeded), mirroring the
+// ComplianceStandard/Item pattern above. FilteringCheck is one visit;
+// FilteringCheckDevice is one device/user/location tested during that
+// visit; FilteringCheckResult is the outcome of one catalogue item against
+// one device.
+// ---------------------------------------------------------------------------
+
+model FilteringCheckItem {
+  id       String  @id @default(cuid())
+  /// Stable slug, e.g. "categories-blocked"
+  code     String  @unique
+  title    String
+  guidance String? @db.Text
+  order    Int     @default(0)
+
+  results FilteringCheckResult[]
+}
+
+model FilteringCheck {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  performedById String
+  performedBy   User     @relation(fields: [performedById], references: [id])
+  performedAt   DateTime @default(now())
+  /// Overall notes for the visit, separate from per-device/per-check action notes.
+  notes         String?  @db.Text
+
+  sentToDslAt DateTime?
+
+  devices FilteringCheckDevice[]
+
+  createdAt DateTime @default(now())
+
+  @@index([tenantId, performedAt])
+}
+
+enum CheckOutcome {
+  PASS
+  FAIL
+  NOT_APPLICABLE
+  NOT_TESTED
+}
+
+model FilteringCheckDevice {
+  id               String         @id @default(cuid())
+  filteringCheckId String
+  filteringCheck   FilteringCheck @relation(fields: [filteringCheckId], references: [id], onDelete: Cascade)
+  /// What was tested, e.g. "Staff laptop — reception", "Student login — Y7", "Guest network"
+  label            String
+  order            Int            @default(0)
+
+  results FilteringCheckResult[]
+}
+
+model FilteringCheckResult {
+  id       String               @id @default(cuid())
+  deviceId String
+  device   FilteringCheckDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  itemId   String
+  item     FilteringCheckItem   @relation(fields: [itemId], references: [id])
+
+  outcome     CheckOutcome @default(NOT_TESTED)
+  actionNotes String?      @db.Text
+
+  @@unique([deviceId, itemId])
 }
 
 // ---------------------------------------------------------------------------

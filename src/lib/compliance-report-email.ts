@@ -1,4 +1,5 @@
 import type { ComplianceStatus, Priority } from "@prisma/client";
+import { escapeHtml, safeHref } from "@/lib/email-html";
 
 const STATUS_LABEL: Record<ComplianceStatus, string> = {
   NOT_STARTED: "Not started",
@@ -24,25 +25,6 @@ type Assessment = {
 };
 type Item = { id: string; title: string; priority: Priority };
 type Standard = { id: string; title: string; items: Item[] };
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-/** Only allow http(s) links into an href — anything else (javascript:, data:, etc.) is dropped. */
-function safeHref(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed.toString() : null;
-  } catch {
-    return null;
-  }
-}
 
 export function buildComplianceReportEmail(params: {
   tenantName: string;
