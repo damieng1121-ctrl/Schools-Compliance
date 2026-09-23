@@ -26,11 +26,11 @@ export function AuthPanel({
 }) {
   return (
     <div className="flex h-full flex-col bg-gradient-to-br from-slate-900 to-slate-800 p-10 text-white">
-      <div className="flex items-center gap-2.5">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white p-1">
-          <PlatformBadge size={24} />
+      <div className="flex items-center gap-3">
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white p-2">
+          <PlatformBadge size={40} />
         </span>
-        <span className="text-[15px] font-bold tracking-tight">Schools Compliance</span>
+        <span className="text-lg font-bold tracking-tight">Schools Compliance</span>
       </div>
       <div className="mt-14">
         <h2 className="max-w-sm text-3xl font-bold leading-tight tracking-tight">{title}</h2>

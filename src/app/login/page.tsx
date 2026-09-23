@@ -150,7 +150,11 @@ export default function LoginPage() {
         &middot;{" "}
         <Link href="/terms" className="hover:text-slate-600 hover:underline">
           Terms
-        </Link>
+        </Link>{" "}
+        &middot;{" "}
+        <a href="mailto:helpdesk@education-lincs.com" className="hover:text-slate-600 hover:underline">
+          Contact us
+        </a>
       </p>
     </AuthShell>
   );
