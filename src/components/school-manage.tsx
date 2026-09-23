@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Building2, UserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Building2, UserPlus, TriangleAlert } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
@@ -34,8 +35,14 @@ type SchoolDetail = {
 };
 
 export function SchoolManage({ tenantId }: { tenantId: string }) {
+  const router = useRouter();
   const [school, setSchool] = useState<SchoolDetail | null>(null);
   const [notFound, setNotFound] = useState(false);
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [urn, setUrn] = useState("");
@@ -105,6 +112,27 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
       if (res.ok) load();
     } finally {
       setTogglingActive(false);
+    }
+  }
+
+  async function deleteSchool() {
+    if (!school || deleteConfirmText !== school.name) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/super-admin/tenants/${tenantId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmName: deleteConfirmText }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setDeleteError(body.error ?? "Something went wrong.");
+        return;
+      }
+      router.push("/dashboard/super-admin");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -288,6 +316,58 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
       <div className="mt-6">
         <FilteringChecksList tenantId={tenantId} hasDslEmail={!!school.dslEmail} />
       </div>
+
+      <Card className="mt-6 border-red-200 p-5">
+        <div className="flex items-center gap-2">
+          <TriangleAlert size={16} className="text-red-500" />
+          <h2 className="font-semibold text-slate-900">Danger zone</h2>
+        </div>
+        {!deleteOpen ? (
+          <>
+            <p className="mt-1 text-sm text-slate-500">
+              Permanently delete this school and everything under it — users, compliance records, and
+              Filtering &amp; Monitoring checks. This can&apos;t be undone. Suspending is usually what you
+              want instead.
+            </p>
+            <Button variant="danger" size="sm" className="mt-3" onClick={() => setDeleteOpen(true)}>
+              Delete school
+            </Button>
+          </>
+        ) : (
+          <div className="mt-3 space-y-3">
+            <p className="text-sm text-slate-700">
+              This will permanently delete <span className="font-semibold">{school.name}</span> and all of
+              its data. Type the school name to confirm.
+            </p>
+            <input
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder={school.name}
+              className={inputClass}
+            />
+            {deleteError && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{deleteError}</p>}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="danger"
+                onClick={deleteSchool}
+                disabled={deleteConfirmText !== school.name || deleting}
+              >
+                {deleting ? "Deleting…" : "Permanently delete"}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setDeleteOpen(false);
+                  setDeleteConfirmText("");
+                  setDeleteError(null);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

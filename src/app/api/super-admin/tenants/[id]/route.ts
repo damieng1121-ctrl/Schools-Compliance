@@ -78,3 +78,40 @@ export async function PATCH(req: Request, { params }: Params) {
     return tenant;
   });
 }
+
+/**
+ * Permanently deletes a school and everything under it (users, compliance
+ * assessments, Filtering & Monitoring checks, audit history) — SUPER_ADMIN
+ * only. Irreversible; requires the caller to pass the school's exact name
+ * as confirmation.
+ */
+export async function DELETE(req: Request, { params }: Params) {
+  return withApiErrors(async () => {
+    const session = await requireRole(["SUPER_ADMIN"]);
+    const { id } = await params;
+
+    const tenant = await prisma.tenant.findUnique({ where: { id } });
+    if (!tenant) throw new AuthError("School not found", 404);
+
+    const { confirmName } = z.object({ confirmName: z.string() }).parse(await req.json());
+    if (confirmName.trim() !== tenant.name) {
+      throw new AuthError("School name didn't match — nothing was deleted", 400);
+    }
+
+    // Logged with tenantId omitted (not the tenant being deleted) so this
+    // record survives the cascade delete below.
+    await prisma.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "tenant.deleted",
+        entityType: "Tenant",
+        entityId: tenant.id,
+        metadata: { name: tenant.name, slug: tenant.slug },
+      },
+    });
+
+    await prisma.tenant.delete({ where: { id } });
+
+    return { deleted: true };
+  });
+}
