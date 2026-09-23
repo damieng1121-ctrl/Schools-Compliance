@@ -128,7 +128,12 @@ export default function SignupPage() {
       </p>
       <p className="mt-2 text-xs text-slate-400">
         Need a hand?{" "}
-        <a href="mailto:helpdesk@education-lincs.com" className="hover:text-slate-600 hover:underline">
+        <a
+          href="https://www.education-lincs.com/contact/contact.html"
+          target="_blank"
+          rel="noreferrer"
+          className="hover:text-slate-600 hover:underline"
+        >
           Contact us
         </a>
       </p>

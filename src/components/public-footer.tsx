@@ -12,7 +12,12 @@ export function PublicFooter() {
           <Link href="/terms" className="hover:text-slate-900 hover:underline">
             Terms of service
           </Link>
-          <a href="mailto:helpdesk@education-lincs.com" className="hover:text-slate-900 hover:underline">
+          <a
+            href="https://www.education-lincs.com/contact/contact.html"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-slate-900 hover:underline"
+          >
             Contact
           </a>
         </div>
