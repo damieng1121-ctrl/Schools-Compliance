@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Building2, UserPlus, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Building2, UserPlus, TriangleAlert, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
@@ -59,6 +59,9 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
   const [addingUser, setAddingUser] = useState(false);
   const [addUserError, setAddUserError] = useState<string | null>(null);
 
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
   function load() {
     fetch(`/api/super-admin/tenants/${tenantId}`)
       .then((r) => {
@@ -112,6 +115,19 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
       if (res.ok) load();
     } finally {
       setTogglingActive(false);
+    }
+  }
+
+  async function removeUser(userId: string) {
+    setRemovingId(userId);
+    try {
+      const res = await fetch(`/api/super-admin/tenants/${tenantId}/users/${userId}`, { method: "DELETE" });
+      if (res.ok) {
+        setConfirmRemoveId(null);
+        load();
+      }
+    } finally {
+      setRemovingId(null);
     }
   }
 
@@ -303,6 +319,30 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
               <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
                 {u.role}
               </span>
+              {confirmRemoveId === u.id ? (
+                <div className="flex shrink-0 items-center gap-2">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => removeUser(u.id)}
+                    disabled={removingId === u.id}
+                  >
+                    {removingId === u.id ? "Removing…" : "Confirm remove"}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setConfirmRemoveId(null)}>
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmRemoveId(u.id)}
+                  title="Remove from school"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600"
+                >
+                  <X size={15} />
+                </button>
+              )}
             </div>
           ))}
           {school.users.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">No users yet.</p>}
