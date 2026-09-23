@@ -5,6 +5,7 @@ import { requireRole, AuthError } from "@/lib/session";
 import { withApiErrors } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { getNotificationProvider } from "@/lib/notifications";
+import { buildWelcomeEmail } from "@/lib/welcome-email";
 
 /** Lists every platform super admin — SUPER_ADMIN only. */
 export async function GET() {
@@ -41,11 +42,15 @@ export async function POST(req: Request) {
     });
 
     const notifications = getNotificationProvider();
-    await notifications.send({
-      to: email,
+    const { subject, text, html } = buildWelcomeEmail({
       subject: `You've been added as a Schools Compliance platform admin`,
-      text: `Hi ${name},\n\nYou've been given platform admin access on Schools Compliance — you can see and manage every school.\n\nSign in at ${process.env.NEXTAUTH_URL ?? "http://localhost:3004"}/login with:\n  Email: ${email}\n  Temporary password: ${tempPassword}\n\nYou'll be able to change your password once signed in.`,
+      recipientName: name,
+      intro: "You've been given platform admin access on Schools Compliance — you can see and manage every school.",
+      email,
+      tempPassword,
+      appUrl: process.env.NEXTAUTH_URL,
     });
+    await notifications.send({ to: email, subject, text, html });
 
     await prisma.auditLog.create({
       data: {

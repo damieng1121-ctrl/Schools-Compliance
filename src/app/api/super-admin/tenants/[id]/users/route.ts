@@ -5,6 +5,7 @@ import { requireRole, AuthError } from "@/lib/session";
 import { withApiErrors } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { getNotificationProvider } from "@/lib/notifications";
+import { buildWelcomeEmail } from "@/lib/welcome-email";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -37,11 +38,15 @@ export async function POST(req: Request, { params }: Params) {
     });
 
     const notifications = getNotificationProvider();
-    await notifications.send({
-      to: email,
+    const { subject, text, html } = buildWelcomeEmail({
       subject: `You've been added to ${tenant.name}'s compliance dashboard`,
-      text: `Hi ${name},\n\nYou've been added as a ${role === "ADMIN" ? "admin" : "team member"} on ${tenant.name}'s Schools Compliance dashboard.\n\nSign in at ${process.env.NEXTAUTH_URL ?? "http://localhost:3004"}/login with:\n  Email: ${email}\n  Temporary password: ${tempPassword}\n\nYou'll be able to change your password once signed in.`,
+      recipientName: name,
+      intro: `You've been added as a${role === "ADMIN" ? "n" : ""} ${role === "ADMIN" ? "admin" : "team member"} on ${tenant.name}'s Schools Compliance dashboard.`,
+      email,
+      tempPassword,
+      appUrl: process.env.NEXTAUTH_URL,
     });
+    await notifications.send({ to: email, subject, text, html });
 
     await prisma.auditLog.create({
       data: {

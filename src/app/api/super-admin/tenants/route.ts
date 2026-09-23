@@ -6,6 +6,7 @@ import { withApiErrors } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/slugify";
 import { getNotificationProvider } from "@/lib/notifications";
+import { buildWelcomeEmail } from "@/lib/welcome-email";
 
 /** Platform-wide view across every school — SUPER_ADMIN only. */
 export async function GET() {
@@ -76,11 +77,15 @@ export async function POST(req: Request) {
     });
 
     const notifications = getNotificationProvider();
-    await notifications.send({
-      to: adminEmail,
+    const { subject, text, html } = buildWelcomeEmail({
       subject: `Your school's compliance dashboard is ready`,
-      text: `Hi ${adminName},\n\n${schoolName} has been set up on Schools Compliance, with you as the admin.\n\nSign in at ${process.env.NEXTAUTH_URL ?? "http://localhost:3004"}/login with:\n  Email: ${adminEmail}\n  Temporary password: ${tempPassword}\n\nYou'll be able to change your password once signed in.`,
+      recipientName: adminName,
+      intro: `${schoolName} has been set up on Schools Compliance, with you as the admin.`,
+      email: adminEmail,
+      tempPassword,
+      appUrl: process.env.NEXTAUTH_URL,
     });
+    await notifications.send({ to: adminEmail, subject, text, html });
 
     await prisma.auditLog.create({
       data: {
