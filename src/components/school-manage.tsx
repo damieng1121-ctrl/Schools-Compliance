@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { inputClass, labelClass } from "@/components/ui/input";
-import { ComplianceReadOnly } from "@/components/compliance-readonly";
+import { ComplianceManage } from "@/components/compliance-manage";
 import { FilteringChecksList } from "@/components/filtering-checks-list";
 
 type Member = {
@@ -350,7 +350,7 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
       </Card>
 
       <div className="mt-6">
-        <ComplianceReadOnly tenantId={tenantId} />
+        <ComplianceManage tenantId={tenantId} />
       </div>
 
       <div className="mt-6">
