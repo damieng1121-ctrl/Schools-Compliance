@@ -269,6 +269,11 @@ function ComplianceItemRow({
               placeholder="https://…"
               className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
             />
+            <p className="mt-1 text-xs text-slate-400">
+              A link to a document, photo, or network diagram — Google Drive works well. Make sure it&apos;s
+              shared with &ldquo;Anyone with the link&rdquo; (or your reviewers directly), not restricted to
+              your school&apos;s internal Drive users, or others won&apos;t be able to open it.
+            </p>
           </div>
           <Button size="sm" onClick={save} disabled={saving}>
             {justSaved && <Check size={14} />}
