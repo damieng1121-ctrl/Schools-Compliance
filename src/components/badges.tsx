@@ -33,3 +33,15 @@ export function ComplianceBadge({ status }: { status: ComplianceStatus }) {
     </span>
   );
 }
+
+/** Flags one of the DfE's 6 "core standards" — the minimum baseline every school is expected to meet by 2030. */
+export function CoreStandardBadge() {
+  return (
+    <span
+      title="DfE core standard — part of the minimum baseline schools and colleges are expected to meet by 2030"
+      className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white"
+    >
+      Core standard
+    </span>
+  );
+}

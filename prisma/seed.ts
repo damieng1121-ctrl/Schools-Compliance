@@ -21,7 +21,7 @@ const GOV_BASE = "https://www.gov.uk/guidance/meeting-digital-and-technology-sta
 const STANDARDS = [
   {
     code: "broadband",
-    title: "Broadband",
+    title: "Broadband internet",
     description: "Connectivity is fast and reliable enough for whole-school digital teaching and administration.",
     officialUrl: `${GOV_BASE}/broadband-internet-standards-for-schools-and-colleges`,
     items: [
@@ -73,50 +73,36 @@ const STANDARDS = [
     ],
   },
   {
-    code: "network-switches",
-    title: "Network switches & cabling",
+    code: "network-switching",
+    title: "Network switching",
     description: "The physical network is managed, monitored, and free of single points of failure.",
+    officialUrl: `${GOV_BASE}/network-switching-standards-for-schools-and-colleges`,
     items: [
       {
         code: "switches-managed",
         title: "Managed switching",
         description: "Core and edge switches are managed, support VLANs, and are centrally monitored.",
-        govLink: `${GOV_BASE}/network-switching-standards-for-schools-and-colleges`,
         priority: "HIGH" as const,
-      },
-      {
-        code: "cabling-standard",
-        title: "Structured cabling",
-        description: "Cabling meets at least Cat5e (ideally Cat6) to support required network speeds.",
-        govLink: `${GOV_BASE}/network-cabling-standards-for-schools-and-colleges`,
-        priority: "MEDIUM" as const,
       },
       {
         code: "switches-resilience",
         title: "No single point of failure",
         description: "Core switching has redundancy so one device failing doesn't take down the whole network.",
-        govLink: `${GOV_BASE}/network-switching-standards-for-schools-and-colleges`,
         priority: "MEDIUM" as const,
       },
     ],
   },
   {
-    code: "servers",
-    title: "Servers",
-    description: "On-premise and cloud server estate is documented, backed up, and kept within support.",
-    officialUrl: `${GOV_BASE}/servers-and-storage-standards-for-schools-and-colleges`,
+    code: "network-cabling",
+    title: "Network cabling",
+    description: "Physical cabling meets required specifications to support reliable network speeds.",
+    officialUrl: `${GOV_BASE}/network-cabling-standards-for-schools-and-colleges`,
     items: [
       {
-        code: "servers-inventory",
-        title: "Documented estate",
-        description: "All servers (physical, virtual, cloud) are inventoried with owners and end-of-support dates.",
+        code: "cabling-standard",
+        title: "Structured cabling",
+        description: "Cabling meets at least Cat5e (ideally Cat6) to support required network speeds.",
         priority: "MEDIUM" as const,
-      },
-      {
-        code: "servers-backup",
-        title: "Tested backups",
-        description: "A 3-2-1 backup strategy is in place and restores are tested at least annually.",
-        priority: "HIGH" as const,
       },
     ],
   },
@@ -210,36 +196,10 @@ const STANDARDS = [
     ],
   },
   {
-    code: "cloud-solutions",
-    title: "Cloud solutions",
-    description: "Cloud platforms used by the school protect data appropriately and are managed with clear ownership.",
-    officialUrl: `${GOV_BASE}/cloud-solution-standards-for-schools-and-colleges`,
-    items: [
-      {
-        code: "cloud-data-protection",
-        title: "Data protection compliance",
-        description: "Cloud providers in use (MIS, Google Workspace, etc.) meet UK GDPR requirements, with data processing agreements in place.",
-        priority: "HIGH" as const,
-      },
-      {
-        code: "cloud-access-control",
-        title: "Least-privilege access",
-        description: "Role-based access control is applied to cloud platforms; leavers are removed promptly.",
-        priority: "HIGH" as const,
-      },
-      {
-        code: "cloud-backup-restore",
-        title: "Backup and restore capability",
-        description: "Cloud services used for critical data have a documented backup/restore capability, not just vendor-assumed durability.",
-        priority: "MEDIUM" as const,
-      },
-    ],
-  },
-  {
     code: "digital-leadership",
-    title: "Digital leadership",
+    title: "Digital leadership and governance",
     description: "Someone owns digital strategy, and it's resourced.",
-    officialUrl: `${GOV_BASE}/digital-leadership-and-governance-standards`,
+    officialUrl: `${GOV_BASE}/digital-leadership-and-governance-core-standard`,
     items: [
       {
         code: "leadership-named",
@@ -262,20 +222,47 @@ const STANDARDS = [
     ],
   },
   {
-    code: "business-continuity",
-    title: "Business continuity & disaster recovery",
-    description: "The school can keep operating, or recover quickly, if critical systems fail.",
+    code: "servers",
+    title: "Servers and storage",
+    description: "On-premise and cloud server estate is documented, backed up, and kept within support.",
+    officialUrl: `${GOV_BASE}/servers-and-storage-standards-for-schools-and-colleges`,
     items: [
       {
-        code: "bcdr-plan",
-        title: "BCDR plan documented and tested",
-        description: "A business continuity / disaster recovery plan exists and has been tested in the last 12 months.",
+        code: "servers-inventory",
+        title: "Documented estate",
+        description: "All servers (physical, virtual, cloud) are inventoried with owners and end-of-support dates.",
+        priority: "MEDIUM" as const,
+      },
+      {
+        code: "servers-backup",
+        title: "Tested backups",
+        description: "A 3-2-1 backup strategy is in place and restores are tested at least annually.",
+        priority: "HIGH" as const,
+      },
+    ],
+  },
+  {
+    code: "cloud-solutions",
+    title: "Cloud solutions",
+    description: "Cloud platforms used by the school protect data appropriately and are managed with clear ownership.",
+    officialUrl: `${GOV_BASE}/cloud-solution-standards-for-schools-and-colleges`,
+    items: [
+      {
+        code: "cloud-data-protection",
+        title: "Data protection compliance",
+        description: "Cloud providers in use (MIS, Google Workspace, etc.) meet UK GDPR requirements, with data processing agreements in place.",
         priority: "HIGH" as const,
       },
       {
-        code: "bcdr-rto",
-        title: "Recovery objectives defined",
-        description: "Recovery time objectives are defined for critical systems (MIS, safeguarding records, finance).",
+        code: "cloud-access-control",
+        title: "Least-privilege access",
+        description: "Role-based access control is applied to cloud platforms; leavers are removed promptly.",
+        priority: "HIGH" as const,
+      },
+      {
+        code: "cloud-backup-restore",
+        title: "Backup and restore capability",
+        description: "Cloud services used for critical data have a documented backup/restore capability, not just vendor-assumed durability.",
         priority: "MEDIUM" as const,
       },
     ],
@@ -334,7 +321,7 @@ const STANDARDS = [
   },
   {
     code: "devices",
-    title: "Laptops, desktops & tablets",
+    title: "Laptop, desktop and tablet",
     description: "Standards on device specification, management, and security across the school's device estate.",
     officialUrl: `${GOV_BASE}/laptop-desktop-and-tablet-standards`,
     items: [
@@ -361,6 +348,25 @@ const STANDARDS = [
         title: "Disk encryption",
         description: "Devices that can hold personal data are encrypted (BitLocker/FileVault/equivalent).",
         priority: "HIGH" as const,
+      },
+    ],
+  },
+  {
+    code: "business-continuity",
+    title: "Business continuity & disaster recovery",
+    description: "The school can keep operating, or recover quickly, if critical systems fail.",
+    items: [
+      {
+        code: "bcdr-plan",
+        title: "BCDR plan documented and tested",
+        description: "A business continuity / disaster recovery plan exists and has been tested in the last 12 months.",
+        priority: "HIGH" as const,
+      },
+      {
+        code: "bcdr-rto",
+        title: "Recovery objectives defined",
+        description: "Recovery time objectives are defined for critical systems (MIS, safeguarding records, finance).",
+        priority: "MEDIUM" as const,
       },
     ],
   },

@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Printer, ExternalLink } from "lucide-react";
-import { ComplianceBadge } from "@/components/badges";
+import { ComplianceBadge, CoreStandardBadge } from "@/components/badges";
 import { Button } from "@/components/ui/button";
 import { PlatformBadge } from "@/components/platform-badge";
+import { isCoreStandard } from "@/lib/dfe-standards";
 
 type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
 type Assessment = {
@@ -22,7 +23,7 @@ type Item = {
   priority: "HIGH" | "MEDIUM" | "LOW";
   assessment: Assessment;
 };
-type Standard = { id: string; title: string; description: string; items: Item[] };
+type Standard = { id: string; code: string; title: string; description: string; items: Item[] };
 type Tenant = { name: string; logoUrl: string | null };
 
 const PRIORITY_STYLES: Record<Item["priority"], string> = {
@@ -96,6 +97,12 @@ export default function CompliancePrintReportPage() {
               style={{ width: `${overallPct}%` }}
             />
           </div>
+          <p className="mt-3 text-xs text-slate-400">
+            <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-slate-900 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-white">
+              Core standard
+            </span>
+            marks the 6 standards DfE expects every school and college to meet by 2030 — the minimum baseline.
+          </p>
         </div>
 
         <div className="mt-8 space-y-8">
@@ -104,7 +111,10 @@ export default function CompliancePrintReportPage() {
             return (
               <section key={standard.id}>
                 <div className="flex items-baseline justify-between">
-                  <h2 className="text-base font-bold tracking-tight text-slate-900">{standard.title}</h2>
+                  <h2 className="flex items-center gap-2 text-base font-bold tracking-tight text-slate-900">
+                    {standard.title}
+                    {isCoreStandard(standard.code) && <CoreStandardBadge />}
+                  </h2>
                   <p className="text-xs font-medium text-slate-500">
                     {met}/{standard.items.length} met
                   </p>

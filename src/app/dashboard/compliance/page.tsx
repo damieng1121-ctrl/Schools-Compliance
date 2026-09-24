@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, Mail, ExternalLink, Check, Printer } from "lucide-react";
 import Link from "next/link";
-import { ComplianceBadge } from "@/components/badges";
+import { ComplianceBadge, CoreStandardBadge } from "@/components/badges";
+import { isCoreStandard } from "@/lib/dfe-standards";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
@@ -116,6 +117,13 @@ export default function CompliancePage() {
             style={{ width: `${overallPct}%` }}
           />
         </div>
+        <p className="mt-3 text-xs text-slate-400">
+          <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-slate-900 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-white">
+            Core standard
+          </span>
+          marks the 6 standards DfE expects every school and college to meet by 2030 — the minimum baseline. The
+          rest of the checklist is still real DfE guidance, just not part of that minimum.
+        </p>
       </Card>
 
       <div className="mt-6 space-y-5">
@@ -126,7 +134,10 @@ export default function CompliancePage() {
             <Card key={standard.id} className="overflow-hidden">
               <div className="border-b border-slate-100 p-5">
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="font-semibold text-slate-900">{standard.title}</h2>
+                  <h2 className="flex items-center gap-2 font-semibold text-slate-900">
+                    {standard.title}
+                    {isCoreStandard(standard.code) && <CoreStandardBadge />}
+                  </h2>
                   <div className="flex shrink-0 items-center gap-2">
                     <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100">
                       <div className="h-full rounded-full bg-emerald-500" style={{ width: `${donePct}%` }} />

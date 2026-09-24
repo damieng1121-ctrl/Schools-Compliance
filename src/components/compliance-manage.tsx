@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ExternalLink, Check, Mail } from "lucide-react";
 import clsx from "clsx";
-import { ComplianceBadge } from "@/components/badges";
+import { ComplianceBadge, CoreStandardBadge } from "@/components/badges";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { inputClass, labelClass } from "@/components/ui/input";
+import { isCoreStandard } from "@/lib/dfe-standards";
 
 type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
 type Assessment = {
@@ -18,7 +19,7 @@ type Assessment = {
   reviewedByName: string | null;
 };
 type Item = { id: string; title: string; description: string; assessment: Assessment };
-type Standard = { id: string; title: string; items: Item[] };
+type Standard = { id: string; code: string; title: string; items: Item[] };
 
 /** Editable view of a school's compliance answers, for platform admins to fill in on a school's behalf. */
 export function ComplianceManage({ tenantId }: { tenantId: string }) {
@@ -83,8 +84,9 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
       <div className="divide-y divide-slate-100">
         {standards.map((standard) => (
           <div key={standard.id}>
-            <div className="bg-slate-50/60 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <div className="flex items-center gap-2 bg-slate-50/60 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
               {standard.title}
+              {isCoreStandard(standard.code) && <CoreStandardBadge />}
             </div>
             {standard.items.map((item) => (
               <ComplianceManageRow

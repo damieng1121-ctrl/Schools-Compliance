@@ -1,5 +1,6 @@
 import type { ComplianceStatus, Priority } from "@prisma/client";
 import { escapeHtml, safeHref } from "@/lib/email-html";
+import { isCoreStandard } from "@/lib/dfe-standards";
 
 const STATUS_LABEL: Record<ComplianceStatus, string> = {
   NOT_STARTED: "Not started",
@@ -24,7 +25,7 @@ type Assessment = {
   nextReviewDue: Date | null;
 };
 type Item = { id: string; title: string; priority: Priority };
-type Standard = { id: string; title: string; items: Item[] };
+type Standard = { id: string; code: string; title: string; items: Item[] };
 
 export function buildComplianceReportEmail(params: {
   tenantName: string;
@@ -96,7 +97,10 @@ export function buildComplianceReportEmail(params: {
       const pct = total ? Math.round((met / total) * 100) : 0;
       return `
         <tr>
-          <td style="padding:10px 0;border-top:1px solid #f1f5f9;font-size:13px;color:#0f172a;">${escapeHtml(standard.title)}</td>
+          <td style="padding:10px 0;border-top:1px solid #f1f5f9;font-size:13px;color:#0f172a;">
+            ${escapeHtml(standard.title)}
+            ${isCoreStandard(standard.code) ? `<span style="margin-left:6px;display:inline-block;padding:1px 6px;border-radius:99px;background:#0f172a;color:#ffffff;font-size:9px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;vertical-align:middle;">Core</span>` : ""}
+          </td>
           <td style="padding:10px 0;border-top:1px solid #f1f5f9;width:120px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
               <td style="height:6px;border-radius:3px;background:#10b981;width:${pct}%;font-size:0;line-height:0;">&nbsp;</td>
