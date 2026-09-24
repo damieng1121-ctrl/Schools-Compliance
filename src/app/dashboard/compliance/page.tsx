@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Mail, ExternalLink, Check } from "lucide-react";
+import { ChevronDown, Mail, ExternalLink, Check, Printer } from "lucide-react";
+import Link from "next/link";
 import { ComplianceBadge } from "@/components/badges";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,16 +83,24 @@ export default function CompliancePage() {
             before reporting compliance externally.
           </p>
         </div>
-        <Button variant="secondary" onClick={emailReport} disabled={emailState === "sending"} className="shrink-0">
-          <Mail size={15} />
-          {emailState === "sending"
-            ? "Sending…"
-            : emailState === "sent"
-              ? "Sent ✓"
-              : emailState === "error"
-                ? "Failed — try again"
-                : "Email me this report"}
-        </Button>
+        <div className="flex shrink-0 gap-2">
+          <Link href="/dashboard/compliance/report">
+            <Button variant="secondary">
+              <Printer size={15} />
+              Print / PDF
+            </Button>
+          </Link>
+          <Button variant="secondary" onClick={emailReport} disabled={emailState === "sending"}>
+            <Mail size={15} />
+            {emailState === "sending"
+              ? "Sending…"
+              : emailState === "sent"
+                ? "Sent ✓"
+                : emailState === "error"
+                  ? "Failed — try again"
+                  : "Email me this report"}
+          </Button>
+        </div>
       </div>
 
       <Card className="mt-5 p-5">

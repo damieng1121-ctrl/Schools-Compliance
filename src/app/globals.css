@@ -63,3 +63,18 @@ body {
   font-weight: 500;
   text-decoration: underline;
 }
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    margin: 14mm 12mm;
+  }
+
+  body {
+    background: #ffffff;
+  }
+}

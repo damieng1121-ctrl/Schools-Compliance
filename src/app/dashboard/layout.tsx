@@ -17,8 +17,8 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
     : null;
 
   return (
-    <div className="flex min-h-screen flex-1 bg-[#f7f7f8]">
-      <div className="border-r border-slate-200/80">
+    <div className="flex min-h-screen flex-1 bg-[#f7f7f8] print:block print:bg-white">
+      <div className="border-r border-slate-200/80 print:hidden">
         <DashboardNav
           tenantName={isSuperAdmin ? "Platform admin" : (tenant?.name ?? "Your school")}
           tenantLogoUrl={tenant?.logoUrl}
@@ -27,8 +27,8 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
           isSuperAdmin={isSuperAdmin}
         />
       </div>
-      <main className="flex-1 overflow-x-hidden p-8">
-        <div className="mx-auto max-w-6xl animate-fade-in">{children}</div>
+      <main className="flex-1 overflow-x-hidden p-8 print:p-0">
+        <div className="mx-auto max-w-6xl animate-fade-in print:max-w-none">{children}</div>
       </main>
     </div>
   );
