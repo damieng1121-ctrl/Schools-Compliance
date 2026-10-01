@@ -20,6 +20,7 @@ type Item = {
   id: string;
   title: string;
   description: string;
+  govLink: string | null;
   priority: "HIGH" | "MEDIUM" | "LOW";
   assessment: Assessment;
 };
@@ -134,6 +135,17 @@ export default function CompliancePrintReportPage() {
                         <ComplianceBadge status={item.assessment.status} />
                       </div>
                       <p className="mt-0.5 text-xs text-slate-500">{item.description}</p>
+                      {item.govLink && (
+                        <a
+                          href={item.govLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-slate-900 hover:underline print:hidden"
+                        >
+                          Full DfE wording for this item
+                          <ExternalLink size={9} />
+                        </a>
+                      )}
                       {item.assessment.evidenceNotes && (
                         <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600">
                           {item.assessment.evidenceNotes}

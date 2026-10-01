@@ -7,6 +7,7 @@ import { ComplianceBadge, CoreStandardBadge } from "@/components/badges";
 import { isCoreStandard } from "@/lib/dfe-standards";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { DfeSourceText } from "@/components/dfe-source-text";
 import clsx from "clsx";
 
 type Assessment = {
@@ -20,6 +21,7 @@ type Item = {
   code: string;
   title: string;
   description: string;
+  sourceText: string | null;
   guidance: string | null;
   priority: "HIGH" | "MEDIUM" | "LOW";
   govLink: string | null;
@@ -233,19 +235,37 @@ function ComplianceItemRow({
       </button>
 
       {open && (
-        <div className="animate-fade-in space-y-3 px-5 pb-5 pl-11">
-          {item.guidance && <p className="text-sm text-slate-500">{item.guidance}</p>}
-          {item.govLink && (
-            <a
-              href={item.govLink}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs font-medium text-slate-900 hover:underline"
-            >
-              Specific DfE guidance for this item
-              <ExternalLink size={11} />
-            </a>
+        <div className="animate-fade-in space-y-4 px-5 pb-5 pl-11">
+          <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">In plain English</p>
+            <p className="mt-1 text-sm text-slate-700">{item.description}</p>
+            {item.guidance && <p className="mt-1.5 text-sm font-medium text-slate-900">{item.guidance}</p>}
+          </div>
+
+          {item.sourceText && (
+            <div className="rounded-lg border border-slate-200 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-900">
+                  What the DfE standard says, word for word
+                </p>
+                {item.govLink && (
+                  <a
+                    href={item.govLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 hover:underline"
+                  >
+                    View on GOV.UK
+                    <ExternalLink size={11} />
+                  </a>
+                )}
+              </div>
+              <div className="mt-2">
+                <DfeSourceText text={item.sourceText} />
+              </div>
+            </div>
           )}
+
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-medium text-slate-600">Status</label>

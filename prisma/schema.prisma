@@ -84,6 +84,7 @@ model ComplianceStandard {
   /// Stable slug matching the DfE standard, e.g. "cyber-security"
   code        String  @unique
   title       String
+  /// Plain-English, one-line summary for a Headteacher/IT Lead/SBM audience — not DfE wording.
   description String  @db.Text
   officialUrl String?
   order       Int     @default(0)
@@ -102,8 +103,18 @@ model ComplianceItem {
   standardId  String
   standard    ComplianceStandard @relation(fields: [standardId], references: [id], onDelete: Cascade)
   code        String
+  /// The DfE sub-heading for this requirement, verbatim from GOV.UK.
   title       String
+  /// Plain-English explanation for a Headteacher/IT Lead/SBM audience — our own
+  /// writing, not DfE wording. Kept visually and structurally separate from
+  /// `sourceText` so the two are never blended.
   description String             @db.Text
+  /// Verbatim DfE requirement text for this item (why it matters / how to meet
+  /// it / technical requirements / when to meet it), word-for-word from the
+  /// GOV.UK guidance page at `govLink` (or the standard's `officialUrl`).
+  sourceText  String?            @db.Text
+  /// Short "at a glance" callout of the key minimum/number, if the item has
+  /// one (e.g. "Min 1Gbps to the desktop" or "5-year warranty minimum").
   guidance    String?            @db.Text
   order       Int                @default(0)
   /// How much this item matters relative to others under the same standard

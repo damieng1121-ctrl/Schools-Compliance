@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated SQL from scripts/generate-catalogue-sql.ts
+/prisma/catalogue-sql.json

@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { inputClass, labelClass } from "@/components/ui/input";
 import { isCoreStandard } from "@/lib/dfe-standards";
+import { DfeSourceText } from "@/components/dfe-source-text";
 
 type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
 type Assessment = {
@@ -18,7 +19,14 @@ type Assessment = {
   reviewedAt: string | null;
   reviewedByName: string | null;
 };
-type Item = { id: string; title: string; description: string; assessment: Assessment };
+type Item = {
+  id: string;
+  title: string;
+  description: string;
+  sourceText: string | null;
+  govLink: string | null;
+  assessment: Assessment;
+};
 type Standard = { id: string; code: string; title: string; items: Item[] };
 
 /** Editable view of a school's compliance answers, for platform admins to fill in on a school's behalf. */
@@ -151,7 +159,33 @@ function ComplianceManageRow({
 
       {open && (
         <div className="animate-fade-in space-y-3 px-5 pb-5 pl-11">
-          <p className="text-xs text-slate-500">{item.description}</p>
+          <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">In plain English</p>
+            <p className="mt-1 text-xs text-slate-700">{item.description}</p>
+          </div>
+          {item.sourceText && (
+            <div className="rounded-lg border border-slate-200 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-900">
+                  What the DfE standard says, word for word
+                </p>
+                {item.govLink && (
+                  <a
+                    href={item.govLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 hover:underline"
+                  >
+                    View on GOV.UK
+                    <ExternalLink size={11} />
+                  </a>
+                )}
+              </div>
+              <div className="mt-2">
+                <DfeSourceText text={item.sourceText} />
+              </div>
+            </div>
+          )}
           {item.assessment.reviewedAt && (
             <p className="text-xs text-slate-400">
               Last updated {new Date(item.assessment.reviewedAt).toLocaleDateString("en-GB")}
