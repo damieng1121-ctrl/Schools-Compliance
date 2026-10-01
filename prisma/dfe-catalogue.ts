@@ -47,7 +47,25 @@ function src(parts: { why?: string; how?: string; technical?: string; when?: str
   return sections.join("\n\n---\n\n");
 }
 
-export const STANDARDS = [
+interface ItemData {
+  code: string;
+  title: string;
+  description: string;
+  sourceText: string;
+  guidance?: string;
+  priority: "HIGH" | "MEDIUM" | "LOW";
+  govLink: string;
+}
+
+interface StandardData {
+  code: string;
+  title: string;
+  description: string;
+  officialUrl: string;
+  items: ItemData[];
+}
+
+export const STANDARDS: StandardData[] = [
   // -------------------------------------------------------------------
   // 1. Broadband internet — core standard
   // https://www.gov.uk/guidance/meeting-digital-and-technology-standards-in-schools-and-colleges/broadband-internet-core-standard
