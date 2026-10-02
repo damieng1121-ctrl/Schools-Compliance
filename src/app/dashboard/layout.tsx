@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { DashboardNav } from "@/components/dashboard-nav";
+import { IdleTimeout } from "@/components/idle-timeout";
 import { prisma } from "@/lib/db";
 
 export default async function DashboardLayout({ children }: LayoutProps<"/dashboard">) {
@@ -18,6 +19,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
 
   return (
     <div className="flex min-h-screen flex-1 bg-[#f7f7f8] print:block print:bg-white">
+      <IdleTimeout />
       <div className="border-r border-slate-200/80 print:hidden">
         <DashboardNav
           tenantName={isSuperAdmin ? "Platform admin" : (tenant?.name ?? "Your school")}

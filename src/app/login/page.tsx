@@ -22,6 +22,17 @@ function GoogleError() {
   );
 }
 
+function TimeoutNotice() {
+  const params = useSearchParams();
+  if (!params.get("timeout")) return null;
+  return (
+    <p className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      You were signed out after 5 minutes of inactivity. Any unsaved changes were saved first — please sign in
+      again.
+    </p>
+  );
+}
+
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
@@ -125,6 +136,11 @@ export default function LoginPage() {
       </div>
       <h1 className="text-xl font-bold tracking-tight text-slate-900">Sign in</h1>
       <p className="mt-1.5 text-sm text-slate-500">Sign in to your school&apos;s compliance dashboard.</p>
+      <div className="mt-4">
+        <Suspense fallback={null}>
+          <TimeoutNotice />
+        </Suspense>
+      </div>
       <Suspense fallback={null}>
         <LoginForm />
       </Suspense>

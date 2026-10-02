@@ -7,7 +7,10 @@ import { ComplianceBadge, CoreStandardBadge } from "@/components/badges";
 import { isCoreStandard } from "@/lib/dfe-standards";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs } from "@/components/ui/tabs";
 import { DfeSourceText } from "@/components/dfe-source-text";
+import { ComplianceLogs } from "@/components/compliance-logs";
+import { registerFlush, unregisterFlush } from "@/lib/idle-logout";
 import clsx from "clsx";
 
 type Assessment = {
@@ -39,11 +42,15 @@ export default function CompliancePage() {
   const [standards, setStandards] = useState<Standard[] | null>(null);
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [activeTab, setActiveTab] = useState<string>("");
 
   function load() {
     fetch("/api/compliance")
       .then((r) => r.json())
-      .then(setStandards);
+      .then((data: Standard[]) => {
+        setStandards(data);
+        setActiveTab((current) => current || data[0]?.id || "logs");
+      });
   }
 
   useEffect(load, []);
@@ -128,54 +135,67 @@ export default function CompliancePage() {
         </p>
       </Card>
 
-      <div className="mt-6 space-y-5">
-        {standards.map((standard) => {
-          const standardCompliant = standard.items.filter((i) => i.assessment.status === "COMPLIANT").length;
-          const donePct = standard.items.length ? Math.round((standardCompliant / standard.items.length) * 100) : 0;
-          return (
-            <Card key={standard.id} className="overflow-hidden">
-              <div className="border-b border-slate-100 p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="flex items-center gap-2 font-semibold text-slate-900">
-                    {standard.title}
-                    {isCoreStandard(standard.code) && <CoreStandardBadge />}
-                  </h2>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100">
-                      <div className="h-full rounded-full bg-emerald-500" style={{ width: `${donePct}%` }} />
-                    </div>
-                    <p className="text-xs font-medium text-slate-500">
-                      {standardCompliant}/{standard.items.length}
-                    </p>
+      <div className="mt-6">
+        <Tabs
+          tabs={[
+            ...standards.map((standard) => {
+              const standardCompliant = standard.items.filter((i) => i.assessment.status === "COMPLIANT").length;
+              return {
+                id: standard.id,
+                label: standard.title,
+                meta: `${standardCompliant}/${standard.items.length}`,
+                flagged: isCoreStandard(standard.code),
+              };
+            }),
+            { id: "logs", label: "Activity log" },
+          ]}
+          active={activeTab}
+          onChange={setActiveTab}
+        />
+
+        {activeTab === "logs" ? (
+          <Card className="mt-5 overflow-hidden">
+            <ComplianceLogs endpoint="/api/compliance/logs" />
+          </Card>
+        ) : (
+          standards
+            .filter((standard) => standard.id === activeTab)
+            .map((standard) => (
+              <Card key={standard.id} className="mt-5 overflow-hidden">
+                <div className="border-b border-slate-100 p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="flex items-center gap-2 font-semibold text-slate-900">
+                      {standard.title}
+                      {isCoreStandard(standard.code) && <CoreStandardBadge />}
+                    </h2>
                   </div>
+                  <p className="mt-1 text-sm text-slate-500">{standard.description}</p>
+                  {standard.officialUrl && (
+                    <a
+                      href={standard.officialUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-slate-900 hover:underline"
+                    >
+                      Official DfE guidance
+                      <ExternalLink size={11} />
+                    </a>
+                  )}
                 </div>
-                <p className="mt-1 text-sm text-slate-500">{standard.description}</p>
-                {standard.officialUrl && (
-                  <a
-                    href={standard.officialUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-slate-900 hover:underline"
-                  >
-                    Official DfE guidance
-                    <ExternalLink size={11} />
-                  </a>
-                )}
-              </div>
-              <div className="divide-y divide-slate-100">
-                {standard.items.map((item) => (
-                  <ComplianceItemRow
-                    key={item.id}
-                    item={item}
-                    open={openItem === item.id}
-                    onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
-                    onSaved={load}
-                  />
-                ))}
-              </div>
-            </Card>
-          );
-        })}
+                <div className="divide-y divide-slate-100">
+                  {standard.items.map((item) => (
+                    <ComplianceItemRow
+                      key={item.id}
+                      item={item}
+                      open={openItem === item.id}
+                      onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
+                      onSaved={load}
+                    />
+                  ))}
+                </div>
+              </Card>
+            ))
+        )}
       </div>
     </div>
   );
@@ -214,6 +234,19 @@ function ComplianceItemRow({
       setSaving(false);
     }
   }
+
+  // Lets the idle-timeout logout (src/components/idle-timeout.tsx) save any
+  // unsaved edits in this row before signing the user out.
+  useEffect(() => {
+    const key = `dashboard-compliance-item-${item.id}`;
+    const dirty =
+      status !== item.assessment.status ||
+      notes !== (item.assessment.evidenceNotes ?? "") ||
+      evidenceUrl !== (item.assessment.evidenceUrl ?? "") ||
+      nextReviewDue !== (item.assessment.nextReviewDue?.slice(0, 10) ?? "");
+    registerFlush(key, () => (dirty ? save() : undefined));
+    return () => unregisterFlush(key);
+  });
 
   return (
     <div className="transition-colors hover:bg-slate-50/60">

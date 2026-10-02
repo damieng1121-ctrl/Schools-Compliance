@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ExternalLink, Check, Mail } from "lucide-react";
 import clsx from "clsx";
-import { ComplianceBadge, CoreStandardBadge } from "@/components/badges";
+import { ComplianceBadge } from "@/components/badges";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs } from "@/components/ui/tabs";
 import { inputClass, labelClass } from "@/components/ui/input";
 import { isCoreStandard } from "@/lib/dfe-standards";
 import { DfeSourceText } from "@/components/dfe-source-text";
+import { ComplianceLogs } from "@/components/compliance-logs";
+import { registerFlush, unregisterFlush } from "@/lib/idle-logout";
 
 type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
 type Assessment = {
@@ -35,11 +38,15 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("");
 
   function load() {
     fetch(`/api/super-admin/tenants/${tenantId}/compliance`)
       .then((r) => r.json())
-      .then(setStandards);
+      .then((data: Standard[]) => {
+        setStandards(data);
+        setActiveTab((current) => current || data[0]?.id || "logs");
+      });
   }
 
   useEffect(load, [tenantId]);
@@ -89,26 +96,44 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
           </Button>
         </div>
       </div>
-      <div className="divide-y divide-slate-100">
-        {standards.map((standard) => (
-          <div key={standard.id}>
-            <div className="flex items-center gap-2 bg-slate-50/60 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-              {standard.title}
-              {isCoreStandard(standard.code) && <CoreStandardBadge />}
-            </div>
-            {standard.items.map((item) => (
-              <ComplianceManageRow
-                key={item.id}
-                tenantId={tenantId}
-                item={item}
-                open={openItem === item.id}
-                onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
-                onSaved={load}
-              />
-            ))}
-          </div>
-        ))}
+      <div className="px-5 pt-3">
+        <Tabs
+          tabs={[
+            ...standards.map((standard) => ({
+              id: standard.id,
+              label: standard.title,
+              meta: `${standard.items.filter((i) => i.assessment.status !== "NOT_STARTED").length}/${standard.items.length}`,
+              flagged: isCoreStandard(standard.code),
+            })),
+            { id: "logs", label: "Activity log" },
+          ]}
+          active={activeTab}
+          onChange={setActiveTab}
+        />
       </div>
+
+      {activeTab === "logs" ? (
+        <ComplianceLogs endpoint={`/api/super-admin/tenants/${tenantId}/compliance/logs`} />
+      ) : (
+        <div className="divide-y divide-slate-100">
+          {standards
+            .filter((standard) => standard.id === activeTab)
+            .map((standard) => (
+              <div key={standard.id}>
+                {standard.items.map((item) => (
+                  <ComplianceManageRow
+                    key={item.id}
+                    tenantId={tenantId}
+                    item={item}
+                    open={openItem === item.id}
+                    onToggle={() => setOpenItem(openItem === item.id ? null : item.id)}
+                    onSaved={load}
+                  />
+                ))}
+              </div>
+            ))}
+        </div>
+      )}
     </Card>
   );
 }
@@ -148,6 +173,19 @@ function ComplianceManageRow({
       setSaving(false);
     }
   }
+
+  // Lets the idle-timeout logout (src/components/idle-timeout.tsx) save any
+  // unsaved edits in this row before signing the user out.
+  useEffect(() => {
+    const key = `super-admin-compliance-item-${tenantId}-${item.id}`;
+    const dirty =
+      status !== item.assessment.status ||
+      notes !== (item.assessment.evidenceNotes ?? "") ||
+      evidenceUrl !== (item.assessment.evidenceUrl ?? "") ||
+      nextReviewDue !== (item.assessment.nextReviewDue?.slice(0, 10) ?? "");
+    registerFlush(key, () => (dirty ? save() : undefined));
+    return () => unregisterFlush(key);
+  });
 
   return (
     <div className="border-t border-slate-50">
