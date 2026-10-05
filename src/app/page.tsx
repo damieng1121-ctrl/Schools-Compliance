@@ -31,11 +31,8 @@ export default async function HomePage() {
           place, and email yourself a progress report whenever you need one.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/signup">
-            <Button>Set up your school</Button>
-          </Link>
           <Link href="/login">
-            <Button variant="secondary">Sign in</Button>
+            <Button>Sign in</Button>
           </Link>
         </div>
 

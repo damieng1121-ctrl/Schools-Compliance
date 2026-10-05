@@ -39,8 +39,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
     // Only enabled when AUTH_GOOGLE_ID/AUTH_GOOGLE_SECRET are set — see
     // DEPLOY.md. No account auto-provisioning: Google sign-in only ever
-    // works for a User row an admin already created (via /signup or the
-    // Team page), and only for allow-listed email domains — see signIn().
+    // works for a User row an admin already created (via the super-admin
+    // panel or the Team page), and only for allow-listed email domains —
+    // see signIn().
     ...(process.env.AUTH_GOOGLE_ID
       ? [Google({ authorization: { params: { prompt: "select_account" } } })]
       : []),

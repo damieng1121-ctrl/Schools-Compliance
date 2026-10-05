@@ -153,13 +153,7 @@ export default function LoginPage() {
       <Suspense fallback={null}>
         <GoogleError />
       </Suspense>
-      <p className="mt-6 text-sm text-slate-500">
-        No account yet?{" "}
-        <Link href="/signup" className="font-semibold text-slate-900 hover:underline">
-          Set up your school
-        </Link>
-      </p>
-      <p className="mt-4 text-xs text-slate-400">
+      <p className="mt-6 text-xs text-slate-400">
         <Link href="/privacy" className="hover:text-slate-600 hover:underline">
           Privacy
         </Link>{" "}
