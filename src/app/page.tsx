@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { PublicFooter } from "@/components/public-footer";
 
 const FEATURES = [
-  { icon: ShieldCheck, title: "12 standards, 41 checkpoints", text: "The full DfE digital & technology standards checklist, ready to work through." },
+  { icon: ShieldCheck, title: "12 standards, 50 checkpoints", text: "The full DfE digital & technology standards checklist, ready to work through." },
   { icon: ClipboardCheck, title: "Evidence in one place", text: "Notes, links, and review dates against every item — no more scattered spreadsheets." },
   { icon: Mail, title: "Report in a click", text: "Email yourself a progress report any time, ready to share or keep for your records." },
 ];

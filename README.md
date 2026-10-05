@@ -79,9 +79,11 @@ regardless of how many sites link to it.
 
 ## Notes
 
-- The DfE standards content in `prisma/seed.ts` reflects the shape and spirit
-  of the published standards, not a verbatim copy — confirm current
-  wording/thresholds on GOV.UK before using this for an official return.
+- The DfE standards content in `prisma/dfe-catalogue.ts` (seeded via
+  `prisma/seed.ts`) is sourced word-for-word from GOV.UK — each item's
+  `sourceText` is verbatim, kept visually separate from our own plain-English
+  explanation. DfE updates the standards periodically, so re-confirm against
+  the live pages before using this for an official return.
 - Team invites and the "email me this report" feature both go through the
   SMTP provider configured via `SMTP_*` env vars; unset in production, they
   fail silently (logged server-side) rather than breaking the request they're

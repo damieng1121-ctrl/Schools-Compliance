@@ -124,7 +124,7 @@ export default function LoginPage() {
           title="Sign in to your dashboard"
           description="Track readiness against the DfE digital & technology standards, keep evidence in one place, and report progress with a click."
           points={[
-            { icon: ShieldCheck, text: "12 standards, 41 checkpoints — all in one place" },
+            { icon: ShieldCheck, text: "12 standards, 50 checkpoints — all in one place" },
             { icon: ClipboardCheck, text: "Evidence, notes, and review dates per item" },
             { icon: Mail, text: "Email yourself a progress report any time" },
           ]}
