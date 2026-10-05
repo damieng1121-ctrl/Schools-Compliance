@@ -8,32 +8,38 @@ const { auth } = NextAuth(authConfig);
 // `auth`'s many overloads (Pages API routes, route handlers, Server
 // Components, middleware) make TS infer the wrong one for a plain call —
 // this file only ever uses it as middleware, which is what it was already
-// doing before this file added the branch below.
+// doing before this file added the branches below.
 const authMiddleware = auth as unknown as (
   request: NextRequest,
   event: NextFetchEvent,
 ) => Response | Promise<Response> | undefined;
 
-export default function proxy(request: NextRequest, event: NextFetchEvent) {
-  if (request.nextUrl.pathname.startsWith("/api/auth")) {
-    // Reached via the Firebase Hosting rewrite (rather than hitting Cloud
-    // Run directly): Firebase connects to Cloud Run using Cloud Run's own
-    // default URL and passes the real public hostname separately via
-    // `x-fh-requested-host`. Auth.js's `trustHost` only looks at the
-    // standard `X-Forwarded-Host` header, so without this it derives the
-    // wrong origin during sign-in/callback and throws a "Configuration"
-    // error. Translating the header here fixes it.
-    const firebaseHost = request.headers.get("x-fh-requested-host");
-    if (firebaseHost) {
-      const headers = new Headers(request.headers);
-      headers.set("x-forwarded-host", firebaseHost);
-      headers.set("x-forwarded-proto", "https");
-      return NextResponse.next({ request: { headers } });
-    }
-    return NextResponse.next();
+export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+  // Reached via the Firebase Hosting rewrite (rather than hitting Cloud Run
+  // directly): Firebase connects to Cloud Run using Cloud Run's own default
+  // URL and passes the real public hostname separately via
+  // `x-fh-requested-host`. Auth.js's `trustHost` only looks at the standard
+  // `X-Forwarded-Host`/`X-Forwarded-Proto` headers, so without this it
+  // derives the wrong origin and protocol — breaking the OAuth/credentials
+  // sign-in flow AND, just as importantly, reading back the
+  // `__Secure-`-prefixed session cookie on every later /dashboard request.
+  const firebaseHost = request.headers.get("x-fh-requested-host");
+  if (firebaseHost) {
+    request.headers.set("x-forwarded-host", firebaseHost);
+    request.headers.set("x-forwarded-proto", "https");
   }
 
-  return authMiddleware(request, event);
+  if (request.nextUrl.pathname.startsWith("/api/auth")) {
+    return NextResponse.next({ request: { headers: request.headers } });
+  }
+
+  const authResult = await authMiddleware(request, event);
+  // auth() redirects unauthenticated users to /login — let that through
+  // unchanged. Otherwise, build our own pass-through response rather than
+  // trust that auth()'s own "continue" response carried our header
+  // mutation, so the corrected headers definitely reach the page render.
+  if (authResult?.headers.get("location")) return authResult;
+  return NextResponse.next({ request: { headers: request.headers } });
 }
 
 export const config = {
