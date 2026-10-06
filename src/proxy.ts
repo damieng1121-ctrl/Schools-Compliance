@@ -15,20 +15,6 @@ const authMiddleware = auth as unknown as (
 ) => Response | Promise<Response> | undefined;
 
 export default async function proxy(request: NextRequest, event: NextFetchEvent) {
-  // Reached via the Firebase Hosting rewrite (rather than hitting Cloud Run
-  // directly): Firebase connects to Cloud Run using Cloud Run's own default
-  // URL and passes the real public hostname separately via
-  // `x-fh-requested-host`. Auth.js's `trustHost` only looks at the standard
-  // `X-Forwarded-Host`/`X-Forwarded-Proto` headers, so without this it
-  // derives the wrong origin and protocol — breaking the OAuth/credentials
-  // sign-in flow AND, just as importantly, reading back the
-  // `__Secure-`-prefixed session cookie on every later /dashboard request.
-  const firebaseHost = request.headers.get("x-fh-requested-host");
-  if (firebaseHost) {
-    request.headers.set("x-forwarded-host", firebaseHost);
-    request.headers.set("x-forwarded-proto", "https");
-  }
-
   if (request.nextUrl.pathname.startsWith("/api/auth")) {
     return NextResponse.next({ request: { headers: request.headers } });
   }
