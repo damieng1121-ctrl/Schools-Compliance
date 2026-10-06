@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 
 import { authConfig } from "./auth.config";
 import { prisma } from "./db";
+import { verifyTotpCode, consumeBackupCode } from "./totp";
 
 function allowedGoogleDomains(): string[] {
   return (process.env.GOOGLE_SSO_ALLOWED_DOMAINS ?? "")
@@ -20,10 +21,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        code: { label: "Authentication code", type: "text" },
       },
       async authorize(credentials) {
         const email = typeof credentials?.email === "string" ? credentials.email.toLowerCase().trim() : undefined;
         const password = typeof credentials?.password === "string" ? credentials.password : undefined;
+        const code = typeof credentials?.code === "string" ? credentials.code.trim() : undefined;
         if (!email || !password) return null;
 
         const user = await prisma.user.findUnique({ where: { email }, include: { tenant: true } });
@@ -33,6 +36,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;
+
+        // 2FA is required for every account. An account that hasn't finished
+        // setup (twoFactorEnabled false) can never complete a plain
+        // password sign-in here — only /api/auth/2fa/confirm-setup can turn
+        // it on, and the client re-calls signIn immediately after with the
+        // same code, by which point twoFactorEnabled is already true.
+        if (!user.twoFactorEnabled || !user.twoFactorSecret) return null;
+        if (!code) return null;
+
+        if (!verifyTotpCode(user.twoFactorSecret, code)) {
+          const { matched, remaining } = await consumeBackupCode(code, user.twoFactorBackupCodes);
+          if (!matched) return null;
+          await prisma.user.update({ where: { id: user.id }, data: { twoFactorBackupCodes: remaining } });
+        }
 
         return { id: user.id, email: user.email, name: user.name };
       },

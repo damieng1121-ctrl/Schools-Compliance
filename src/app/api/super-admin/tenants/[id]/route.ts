@@ -15,7 +15,15 @@ export async function GET(_req: Request, { params }: Params) {
       where: { id },
       include: {
         users: {
-          select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            isActive: true,
+            createdAt: true,
+            twoFactorEnabled: true,
+          },
           orderBy: { createdAt: "asc" },
         },
       },

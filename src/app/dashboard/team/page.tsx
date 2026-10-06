@@ -14,6 +14,7 @@ type Member = {
   role: "ADMIN" | "MEMBER";
   isActive: boolean;
   createdAt: string;
+  twoFactorEnabled: boolean;
 };
 
 export default function TeamPage() {
@@ -23,6 +24,7 @@ export default function TeamPage() {
   const [role, setRole] = useState<"ADMIN" | "MEMBER">("MEMBER");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resetting2faId, setResetting2faId] = useState<string | null>(null);
 
   function load() {
     fetch("/api/team")
@@ -31,6 +33,16 @@ export default function TeamPage() {
   }
 
   useEffect(load, []);
+
+  async function reset2fa(userId: string) {
+    setResetting2faId(userId);
+    try {
+      const res = await fetch(`/api/team/${userId}`, { method: "PATCH" });
+      if (res.ok) load();
+    } finally {
+      setResetting2faId(null);
+    }
+  }
 
   async function addMember(e: React.FormEvent) {
     e.preventDefault();
@@ -73,6 +85,21 @@ export default function TeamPage() {
               <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
                 {m.role}
               </span>
+              {m.twoFactorEnabled ? (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => reset2fa(m.id)}
+                  disabled={resetting2faId === m.id}
+                  title="Clear their 2FA so they can re-enroll (e.g. after a lost phone)"
+                >
+                  {resetting2faId === m.id ? "Resetting…" : "Reset 2FA"}
+                </Button>
+              ) : (
+                <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                  2FA not set up
+                </span>
+              )}
             </div>
           ))}
           {members?.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">No team members yet.</p>}

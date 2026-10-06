@@ -33,52 +33,222 @@ function TimeoutNotice() {
   );
 }
 
-function LoginForm() {
+type Stage =
+  | { name: "credentials" }
+  | { name: "setup"; email: string; password: string; qrDataUrl: string; secret: string }
+  | { name: "code"; email: string; password: string; useBackupCode: boolean }
+  | { name: "backup-codes"; codes: string[] };
+
+const inputClass =
+  "mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100";
+
+function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) => void }) {
   const router = useRouter();
   const params = useSearchParams();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [stage, setStageRaw] = useState<Stage>({ name: "credentials" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    const res = await signIn("credentials", { email, password, redirect: false });
-    setLoading(false);
+  function setStage(next: Stage) {
+    setStageRaw(next);
+    onStageChange(next.name === "credentials");
+  }
+
+  async function finishSignIn(email: string, password: string, code: string) {
+    const res = await signIn("credentials", { email, password, code, redirect: false });
     if (res?.error) {
-      setError("Incorrect email or password.");
+      setError("That code didn't work — check your authenticator app and try again.");
+      setLoading(false);
       return;
     }
     router.push(params.get("callbackUrl") ?? "/dashboard");
   }
 
+  async function onCredentialsSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const form = new FormData(e.currentTarget);
+    const email = String(form.get("email") ?? "");
+    const password = String(form.get("password") ?? "");
+
+    const res = await fetch("/api/auth/2fa/status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (!res.ok) {
+      setError(data.error ?? "Incorrect email or password.");
+      return;
+    }
+    if (data.stage === "setup") {
+      setStage({ name: "setup", email, password, qrDataUrl: data.qrDataUrl, secret: data.secret });
+    } else {
+      setStage({ name: "code", email, password, useBackupCode: false });
+    }
+  }
+
+  async function onSetupSubmit(e: React.FormEvent<HTMLFormElement>, current: Extract<Stage, { name: "setup" }>) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const form = new FormData(e.currentTarget);
+    const code = String(form.get("code") ?? "");
+
+    const res = await fetch("/api/auth/2fa/confirm-setup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: current.email, password: current.password, code }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? "That code didn't match — check the time on your phone and try again.");
+      setLoading(false);
+      return;
+    }
+
+    const signInRes = await signIn("credentials", {
+      email: current.email,
+      password: current.password,
+      code,
+      redirect: false,
+    });
+    setLoading(false);
+    if (signInRes?.error) {
+      // Extremely unlikely (the code's 30s window rolled over between the
+      // two requests) — fall back to the normal code-entry screen.
+      setStage({ name: "code", email: current.email, password: current.password, useBackupCode: false });
+      setError("2FA is set up — enter a fresh code from your app to finish signing in.");
+      return;
+    }
+    setStage({ name: "backup-codes", codes: data.backupCodes });
+  }
+
+  async function onCodeSubmit(e: React.FormEvent<HTMLFormElement>, current: Extract<Stage, { name: "code" }>) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const form = new FormData(e.currentTarget);
+    const code = String(form.get("code") ?? "");
+    await finishSignIn(current.email, current.password, code);
+  }
+
+  if (stage.name === "setup") {
+    return (
+      <form onSubmit={(e) => onSetupSubmit(e, stage)} className="mt-6 space-y-4 text-left">
+        <p className="text-sm text-slate-600">
+          Set up two-factor authentication: scan this QR code with an authenticator app (Google Authenticator, Authy,
+          1Password, etc.), then enter the 6-digit code it shows.
+        </p>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={stage.qrDataUrl}
+          alt="2FA setup QR code"
+          className="mx-auto h-40 w-40 rounded-lg border border-slate-200"
+        />
+        <p className="break-all rounded-lg bg-slate-50 px-3 py-2 text-center font-mono text-xs text-slate-500">
+          {stage.secret}
+        </p>
+        <div>
+          <label className="block text-xs font-medium text-slate-600">6-digit code</label>
+          <input
+            name="code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            required
+            autoFocus
+            className={inputClass}
+          />
+        </div>
+        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? "Verifying…" : "Verify & enable"}
+        </Button>
+        <button
+          type="button"
+          onClick={() => {
+            setStage({ name: "credentials" });
+            setError(null);
+          }}
+          className="block w-full text-center text-xs text-slate-400 hover:text-slate-600 hover:underline"
+        >
+          Back
+        </button>
+      </form>
+    );
+  }
+
+  if (stage.name === "code") {
+    return (
+      <form onSubmit={(e) => onCodeSubmit(e, stage)} className="mt-6 space-y-4 text-left">
+        <div>
+          <label className="block text-xs font-medium text-slate-600">
+            {stage.useBackupCode ? "Backup code" : "Authentication code"}
+          </label>
+          <input
+            name="code"
+            inputMode={stage.useBackupCode ? "text" : "numeric"}
+            autoComplete="one-time-code"
+            placeholder={stage.useBackupCode ? "XXXXX-XXXXX" : undefined}
+            maxLength={stage.useBackupCode ? 11 : 6}
+            required
+            autoFocus
+            className={inputClass}
+          />
+        </div>
+        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? "Signing in…" : "Sign in"}
+        </Button>
+        <button
+          type="button"
+          onClick={() => {
+            setStage({ ...stage, useBackupCode: !stage.useBackupCode });
+            setError(null);
+          }}
+          className="block w-full text-center text-xs text-slate-400 hover:text-slate-600 hover:underline"
+        >
+          {stage.useBackupCode ? "Use your authenticator app instead" : "Use a backup code instead"}
+        </button>
+      </form>
+    );
+  }
+
+  if (stage.name === "backup-codes") {
+    return (
+      <div className="mt-6 space-y-4 text-left">
+        <p className="text-sm text-slate-600">
+          Save these one-time backup codes somewhere safe — each can be used once to sign in if you lose access to
+          your authenticator app. They won&apos;t be shown again.
+        </p>
+        <div className="grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-3 font-mono text-xs text-slate-700">
+          {stage.codes.map((c) => (
+            <span key={c}>{c}</span>
+          ))}
+        </div>
+        <Button type="button" className="w-full" onClick={() => router.push(params.get("callbackUrl") ?? "/dashboard")}>
+          I&apos;ve saved these — continue
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <form onSubmit={onSubmit} className="mt-6 space-y-4 text-left">
+    <form onSubmit={onCredentialsSubmit} className="mt-6 space-y-4 text-left">
       <div>
         <label className="block text-xs font-medium text-slate-600">Email</label>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
-        />
+        <input name="email" type="email" required className={inputClass} />
       </div>
       <div>
         <label className="block text-xs font-medium text-slate-600">Password</label>
-        <input
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
-        />
+        <input name="password" type="password" required className={inputClass} />
       </div>
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       <Button type="submit" disabled={loading} className="w-full">
-        {loading ? "Signing in…" : "Sign in"}
+        {loading ? "Checking…" : "Continue"}
       </Button>
     </form>
   );
@@ -117,6 +287,8 @@ function GoogleIcon() {
 }
 
 export default function LoginPage() {
+  const [showGoogle, setShowGoogle] = useState(true);
+
   return (
     <AuthShell
       panel={
@@ -142,17 +314,21 @@ export default function LoginPage() {
         </Suspense>
       </div>
       <Suspense fallback={null}>
-        <LoginForm />
+        <LoginForm onStageChange={setShowGoogle} />
       </Suspense>
-      <div className="mt-6 flex items-center gap-3 text-xs font-medium text-slate-400">
-        <div className="h-px flex-1 bg-slate-200" />
-        or
-        <div className="h-px flex-1 bg-slate-200" />
-      </div>
-      <GoogleSignInButton />
-      <Suspense fallback={null}>
-        <GoogleError />
-      </Suspense>
+      {showGoogle && (
+        <>
+          <div className="mt-6 flex items-center gap-3 text-xs font-medium text-slate-400">
+            <div className="h-px flex-1 bg-slate-200" />
+            or
+            <div className="h-px flex-1 bg-slate-200" />
+          </div>
+          <GoogleSignInButton />
+          <Suspense fallback={null}>
+            <GoogleError />
+          </Suspense>
+        </>
+      )}
       <p className="mt-6 text-xs text-slate-400">
         <Link href="/privacy" className="hover:text-slate-600 hover:underline">
           Privacy

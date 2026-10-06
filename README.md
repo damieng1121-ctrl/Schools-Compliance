@@ -19,6 +19,19 @@ their records.
 - Tailwind CSS
 - Outbound email via SMTP (nodemailer) — falls back to console logging in dev
 
+## Two-factor authentication
+
+Every email/password account must have 2FA enabled — there's no way to sign
+in with just a password. The first time someone signs in (or after an admin
+resets their 2FA), the login page walks them through scanning a QR code with
+an authenticator app (Google Authenticator, Authy, 1Password, etc.) and
+issues 8 one-time backup codes to keep somewhere safe. Google sign-in is
+unaffected — it relies on the user's own Google account security instead.
+
+If someone loses their device, an ADMIN (Team page) or SUPER_ADMIN (a
+school's Manage page) can reset their 2FA, which clears their enrollment and
+sends them back through setup on next login.
+
 ## Getting started
 
 ```bash

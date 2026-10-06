@@ -12,7 +12,15 @@ export async function GET() {
     const session = await requireTenantSession();
     return prisma.user.findMany({
       where: { tenantId: session.user.tenantId },
-      select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        twoFactorEnabled: true,
+      },
       orderBy: { createdAt: "asc" },
     });
   });
