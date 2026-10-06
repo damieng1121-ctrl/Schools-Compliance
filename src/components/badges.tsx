@@ -27,7 +27,12 @@ const LABEL: Record<ComplianceStatus, string> = {
 
 export function ComplianceBadge({ status }: { status: ComplianceStatus }) {
   return (
-    <span className={clsx("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold", STYLES[status])}>
+    <span
+      className={clsx(
+        "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold",
+        STYLES[status],
+      )}
+    >
       <span className={clsx("h-1.5 w-1.5 rounded-full", DOT[status])} />
       {LABEL[status]}
     </span>

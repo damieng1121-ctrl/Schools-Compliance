@@ -322,54 +322,58 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
         </div>
         <div className="divide-y divide-slate-100">
           {school.users.map((u) => (
-            <div key={u.id} className="flex items-center gap-3 px-5 py-3">
-              <Avatar name={u.name ?? u.email} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-900">{u.name ?? u.email}</p>
-                <p className="truncate text-xs text-slate-500">{u.email}</p>
-              </div>
-              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
-                {u.role}
-              </span>
-              {u.twoFactorEnabled ? (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => reset2fa(u.id)}
-                  disabled={resetting2faId === u.id}
-                  title="Clear their 2FA so they can re-enroll (e.g. after a lost phone)"
-                >
-                  {resetting2faId === u.id ? "Resetting…" : "Reset 2FA"}
-                </Button>
-              ) : (
-                <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-                  2FA not set up
-                </span>
-              )}
-              {confirmRemoveId === u.id ? (
-                <div className="flex shrink-0 items-center gap-2">
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => removeUser(u.id)}
-                    disabled={removingId === u.id}
-                  >
-                    {removingId === u.id ? "Removing…" : "Confirm remove"}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setConfirmRemoveId(null)}>
-                    Cancel
-                  </Button>
+            <div key={u.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
+              <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto sm:flex-1">
+                <Avatar name={u.name ?? u.email} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-slate-900">{u.name ?? u.email}</p>
+                  <p className="truncate text-xs text-slate-500">{u.email}</p>
                 </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setConfirmRemoveId(u.id)}
-                  title="Remove from school"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600"
-                >
-                  <X size={15} />
-                </button>
-              )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:ml-auto sm:shrink-0">
+                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+                  {u.role}
+                </span>
+                {u.twoFactorEnabled ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => reset2fa(u.id)}
+                    disabled={resetting2faId === u.id}
+                    title="Clear their 2FA so they can re-enroll (e.g. after a lost phone)"
+                  >
+                    {resetting2faId === u.id ? "Resetting…" : "Reset 2FA"}
+                  </Button>
+                ) : (
+                  <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                    2FA not set up
+                  </span>
+                )}
+                {confirmRemoveId === u.id ? (
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => removeUser(u.id)}
+                      disabled={removingId === u.id}
+                    >
+                      {removingId === u.id ? "Removing…" : "Confirm remove"}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setConfirmRemoveId(null)}>
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmRemoveId(u.id)}
+                    title="Remove from school"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
+              </div>
             </div>
           ))}
           {school.users.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">No users yet.</p>}

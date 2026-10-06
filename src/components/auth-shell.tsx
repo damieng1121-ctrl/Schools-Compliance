@@ -6,8 +6,8 @@ export function AuthShell({ panel, children }: { panel: ReactNode; children: Rea
   return (
     <div className="flex flex-1">
       <div className="hidden w-[42%] shrink-0 lg:block">{panel}</div>
-      <div className="flex flex-1 items-center justify-center bg-[#f7f7f8] px-6 py-16">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-200/80 bg-white p-8 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+      <div className="flex flex-1 items-center justify-center bg-[#f7f7f8] px-4 py-10 sm:px-6 sm:py-16">
+        <div className="w-full max-w-sm rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] sm:p-8">
           {children}
         </div>
       </div>
