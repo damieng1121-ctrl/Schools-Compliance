@@ -1,15 +1,37 @@
+import { z } from "zod";
 import { requireTenantSession, AuthError } from "@/lib/session";
 import { withApiErrors } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { getNotificationProvider } from "@/lib/notifications";
 import { buildComplianceReportEmail } from "@/lib/compliance-report-email";
 
-/** Emails the current DfE compliance report to the requesting user's own address. */
-export async function POST() {
+const bodySchema = z.object({
+  userIds: z.array(z.string()).optional(),
+  extraEmails: z.array(z.string().trim().toLowerCase().email()).optional(),
+});
+
+/** Emails the current DfE compliance report to the selected team members and/or extra addresses — defaults to the requester's own address if nothing is selected. */
+export async function POST(req: Request) {
   return withApiErrors(async () => {
     const session = await requireTenantSession();
-    const recipientEmail = session.user.email;
-    if (!recipientEmail) throw new AuthError("Your account has no email address on file", 400);
+    const raw = await req.text();
+    const { userIds, extraEmails } = bodySchema.parse(raw ? JSON.parse(raw) : {});
+
+    let recipientEmails: string[];
+    if ((userIds && userIds.length) || (extraEmails && extraEmails.length)) {
+      const selectedUsers = userIds?.length
+        ? await prisma.user.findMany({
+            where: { id: { in: userIds }, tenantId: session.user.tenantId, isActive: true },
+            select: { email: true },
+          })
+        : [];
+      recipientEmails = [...new Set([...selectedUsers.map((u) => u.email), ...(extraEmails ?? [])])];
+    } else {
+      if (!session.user.email) throw new AuthError("Your account has no email address on file", 400);
+      recipientEmails = [session.user.email];
+    }
+    if (recipientEmails.length === 0) throw new AuthError("Select at least one recipient", 400);
+    const recipientEmail = recipientEmails.join(", ");
 
     const [tenant, standards, assessments] = await Promise.all([
       prisma.tenant.findUniqueOrThrow({ where: { id: session.user.tenantId } }),
@@ -42,7 +64,7 @@ export async function POST() {
         userId: session.user.id,
         action: "compliance.report_emailed",
         entityType: "ComplianceStandard",
-        metadata: { overallPct, compliantCount, totalItems: allItems.length },
+        metadata: { overallPct, compliantCount, totalItems: allItems.length, recipients: recipientEmails },
       },
     });
 

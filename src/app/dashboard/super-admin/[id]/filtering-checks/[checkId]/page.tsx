@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { FilteringCheckDetailView } from "@/components/filtering-check-detail";
 
 export default async function FilteringCheckDetailPage({
@@ -9,5 +10,14 @@ export default async function FilteringCheckDetailPage({
   if (session?.user.role !== "SUPER_ADMIN") redirect("/dashboard");
   const { id, checkId } = await params;
 
-  return <FilteringCheckDetailView tenantId={id} checkId={checkId} />;
+  const tenant = await prisma.tenant.findUnique({ where: { id }, select: { name: true } });
+
+  return (
+    <FilteringCheckDetailView
+      apiBase={`/api/super-admin/tenants/${id}`}
+      checkId={checkId}
+      backHref={`/dashboard/super-admin/${id}`}
+      backLabel={tenant?.name ?? "Back"}
+    />
+  );
 }

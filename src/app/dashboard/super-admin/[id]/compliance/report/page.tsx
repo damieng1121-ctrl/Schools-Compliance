@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { ComplianceReportView } from "@/components/compliance-report-view";
 import { SendReportDialog } from "@/components/send-report-dialog";
 
@@ -23,18 +23,20 @@ type Item = {
 type Standard = { id: string; code: string; title: string; description: string; items: Item[] };
 type Tenant = { name: string; logoUrl: string | null };
 
-export default function CompliancePrintReportPage() {
+export default function SuperAdminComplianceReportPage({ params }: PageProps<"/dashboard/super-admin/[id]/compliance/report">) {
+  const { id: tenantId } = use(params);
   const [standards, setStandards] = useState<Standard[] | null>(null);
   const [tenant, setTenant] = useState<Tenant | null>(null);
 
   useEffect(() => {
-    Promise.all([fetch("/api/compliance").then((r) => r.json()), fetch("/api/tenant").then((r) => r.json())]).then(
-      ([s, t]) => {
-        setStandards(s);
-        setTenant(t);
-      },
-    );
-  }, []);
+    Promise.all([
+      fetch(`/api/super-admin/tenants/${tenantId}/compliance`).then((r) => r.json()),
+      fetch(`/api/super-admin/tenants/${tenantId}`).then((r) => r.json()),
+    ]).then(([s, t]) => {
+      setStandards(s);
+      setTenant(t);
+    });
+  }, [tenantId]);
 
   if (!standards || !tenant) return <p className="text-sm text-slate-500">Loading…</p>;
 
@@ -42,12 +44,16 @@ export default function CompliancePrintReportPage() {
     <ComplianceReportView
       standards={standards}
       tenant={tenant}
-      backHref="/dashboard/compliance"
-      backLabel="Back to checklist"
+      backHref={`/dashboard/super-admin/${tenantId}`}
+      backLabel={tenant.name || "Back"}
       toolbar={
         <SendReportDialog
-          endpoint="/api/compliance/report"
-          fetchRecipients={() => fetch("/api/team").then((r) => r.json())}
+          endpoint={`/api/super-admin/tenants/${tenantId}/compliance/report`}
+          fetchRecipients={() =>
+            fetch(`/api/super-admin/tenants/${tenantId}`)
+              .then((r) => r.json())
+              .then((t) => t.users ?? [])
+          }
         />
       }
     />

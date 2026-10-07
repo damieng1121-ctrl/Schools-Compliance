@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { ShieldCheck, LayoutDashboard, Users, LogOut, UserCircle, Building2, Settings, UserCog, ChevronRight, Menu, X } from "lucide-react";
+import { ShieldCheck, ShieldAlert, LayoutDashboard, Users, LogOut, UserCircle, Building2, Settings, UserCog, ChevronRight, Menu, X } from "lucide-react";
 import clsx from "clsx";
 import { PlatformBadge } from "@/components/platform-badge";
 import { Avatar } from "@/components/ui/avatar";
@@ -12,6 +12,7 @@ import { Avatar } from "@/components/ui/avatar";
 const LINKS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, tenantOnly: true },
   { href: "/dashboard/compliance", label: "Digital standards", icon: ShieldCheck, tenantOnly: true },
+  { href: "/dashboard/filtering-checks", label: "Filtering & Monitoring", icon: ShieldAlert, tenantOnly: true },
   { href: "/dashboard/team", label: "Team", icon: Users, tenantOnly: true, adminOnly: true },
   { href: "/dashboard/settings", label: "School settings", icon: Settings, tenantOnly: true, adminOnly: true },
   { href: "/dashboard/super-admin", label: "All schools", icon: Building2, superAdminOnly: true },

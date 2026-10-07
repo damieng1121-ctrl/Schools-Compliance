@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Mail, ExternalLink, Check, Printer } from "lucide-react";
+import { ChevronDown, ExternalLink, Check, Printer } from "lucide-react";
 import Link from "next/link";
 import { ComplianceBadge, CoreStandardBadge } from "@/components/badges";
 import { isCoreStandard } from "@/lib/dfe-standards";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tabs";
 import { DfeSourceText } from "@/components/dfe-source-text";
 import { ComplianceLogs } from "@/components/compliance-logs";
+import { SendReportDialog } from "@/components/send-report-dialog";
 import { registerFlush, unregisterFlush } from "@/lib/idle-logout";
 import clsx from "clsx";
 
@@ -41,7 +42,6 @@ type Standard = { id: string; code: string; title: string; description: string; 
 export default function CompliancePage() {
   const [standards, setStandards] = useState<Standard[] | null>(null);
   const [openItem, setOpenItem] = useState<string | null>(null);
-  const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [activeTab, setActiveTab] = useState<string>("");
 
   function load() {
@@ -54,19 +54,6 @@ export default function CompliancePage() {
   }
 
   useEffect(load, []);
-
-  async function emailReport() {
-    setEmailState("sending");
-    try {
-      const res = await fetch("/api/compliance/report", { method: "POST" });
-      if (!res.ok) throw new Error("failed");
-      setEmailState("sent");
-    } catch {
-      setEmailState("error");
-    } finally {
-      setTimeout(() => setEmailState("idle"), 4000);
-    }
-  }
 
   if (!standards) return <p className="text-sm text-slate-500">Loading…</p>;
 
@@ -93,23 +80,14 @@ export default function CompliancePage() {
             before reporting compliance externally.
           </p>
         </div>
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 flex-wrap gap-2">
           <Link href="/dashboard/compliance/report">
             <Button variant="secondary">
               <Printer size={15} />
-              Print / PDF
+              View report
             </Button>
           </Link>
-          <Button variant="secondary" onClick={emailReport} disabled={emailState === "sending"}>
-            <Mail size={15} />
-            {emailState === "sending"
-              ? "Sending…"
-              : emailState === "sent"
-                ? "Sent ✓"
-                : emailState === "error"
-                  ? "Failed — try again"
-                  : "Email me this report"}
-          </Button>
+          <SendReportDialog endpoint="/api/compliance/report" fetchRecipients={() => fetch("/api/team").then((r) => r.json())} />
         </div>
       </div>
 

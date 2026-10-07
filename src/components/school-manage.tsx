@@ -385,7 +385,11 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
       </div>
 
       <div className="mt-6">
-        <FilteringChecksList tenantId={tenantId} hasDslEmail={!!school.dslEmail} />
+        <FilteringChecksList
+          apiBase={`/api/super-admin/tenants/${tenantId}`}
+          detailBase={`/dashboard/super-admin/${tenantId}`}
+          hasDslEmail={!!school.dslEmail}
+        />
       </div>
 
       <Card className="mt-6 border-red-200 p-5">

@@ -15,14 +15,26 @@ type CheckRow = {
   failCount: number;
 };
 
-export function FilteringChecksList({ tenantId, hasDslEmail }: { tenantId: string; hasDslEmail: boolean }) {
+export function FilteringChecksList({
+  apiBase,
+  detailBase,
+  hasDslEmail = false,
+  readOnly = false,
+}: {
+  /** e.g. `/api/super-admin/tenants/${tenantId}` or `/api` (tenant-scoped) — `/filtering-checks` is appended. */
+  apiBase: string;
+  /** e.g. `/dashboard/super-admin/${tenantId}` or `/dashboard` — `/filtering-checks/new|<id>` is appended. */
+  detailBase: string;
+  hasDslEmail?: boolean;
+  readOnly?: boolean;
+}) {
   const [checks, setChecks] = useState<CheckRow[] | null>(null);
 
   useEffect(() => {
-    fetch(`/api/super-admin/tenants/${tenantId}/filtering-checks`)
+    fetch(`${apiBase}/filtering-checks`)
       .then((r) => r.json())
       .then(setChecks);
-  }, [tenantId]);
+  }, [apiBase]);
 
   return (
     <Card>
@@ -31,14 +43,16 @@ export function FilteringChecksList({ tenantId, hasDslEmail }: { tenantId: strin
           <ShieldAlert size={16} className="text-slate-400" />
           <h2 className="font-semibold text-slate-900">Filtering &amp; Monitoring checks</h2>
         </div>
-        <Link href={`/dashboard/super-admin/${tenantId}/filtering-checks/new`}>
-          <Button size="sm">
-            <PlusCircle size={14} />
-            Log a check
-          </Button>
-        </Link>
+        {!readOnly && (
+          <Link href={`${detailBase}/filtering-checks/new`}>
+            <Button size="sm">
+              <PlusCircle size={14} />
+              Log a check
+            </Button>
+          </Link>
+        )}
       </div>
-      {!hasDslEmail && (
+      {!readOnly && !hasDslEmail && (
         <p className="border-b border-slate-100 bg-amber-50 px-5 py-2.5 text-xs text-amber-800">
           No DSL email set for this school yet — reports can be logged but not emailed until one&apos;s added above.
         </p>
@@ -49,7 +63,7 @@ export function FilteringChecksList({ tenantId, hasDslEmail }: { tenantId: strin
         {checks?.map((c) => (
           <Link
             key={c.id}
-            href={`/dashboard/super-admin/${tenantId}/filtering-checks/${c.id}`}
+            href={`${detailBase}/filtering-checks/${c.id}`}
             className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-slate-50/60"
           >
             <div className="min-w-0 flex-1">

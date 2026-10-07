@@ -31,31 +31,43 @@ const OUTCOME_LABEL: Record<Outcome, string> = {
   NOT_TESTED: "Not tested",
 };
 
-export function FilteringCheckDetailView({ tenantId, checkId }: { tenantId: string; checkId: string }) {
+export function FilteringCheckDetailView({
+  apiBase,
+  checkId,
+  backHref,
+  backLabel = "Back",
+  readOnly = false,
+}: {
+  /** e.g. `/api/super-admin/tenants/${tenantId}` or `/api` (tenant-scoped) — `/filtering-checks/<id>` is appended. */
+  apiBase: string;
+  checkId: string;
+  backHref: string;
+  backLabel?: string;
+  readOnly?: boolean;
+}) {
   const [check, setCheck] = useState<CheckDetail | null>(null);
   const [hasDslEmail, setHasDslEmail] = useState(false);
-  const [schoolName, setSchoolName] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   function load() {
-    Promise.all([
-      fetch(`/api/super-admin/tenants/${tenantId}/filtering-checks/${checkId}`).then((r) => r.json()),
-      fetch(`/api/super-admin/tenants/${tenantId}`).then((r) => r.json()),
-    ]).then(([c, tenant]) => {
-      setCheck(c);
-      setSchoolName(tenant.name);
-      setHasDslEmail(!!tenant.dslEmail);
-    });
+    fetch(`${apiBase}/filtering-checks/${checkId}`)
+      .then((r) => r.json())
+      .then(setCheck);
+    if (!readOnly) {
+      fetch(apiBase)
+        .then((r) => r.json())
+        .then((tenant) => setHasDslEmail(!!tenant.dslEmail));
+    }
   }
 
-  useEffect(load, [tenantId, checkId]);
+  useEffect(load, [apiBase, checkId, readOnly]);
 
   async function sendToDsl() {
     setSending(true);
     setError(null);
     try {
-      const res = await fetch(`/api/super-admin/tenants/${tenantId}/filtering-checks/${checkId}/send`, { method: "POST" });
+      const res = await fetch(`${apiBase}/filtering-checks/${checkId}/send`, { method: "POST" });
       const body = await res.json();
       if (!res.ok) {
         setError(body.error ?? "Something went wrong.");
@@ -73,12 +85,9 @@ export function FilteringCheckDetailView({ tenantId, checkId }: { tenantId: stri
 
   return (
     <div>
-      <Link
-        href={`/dashboard/super-admin/${tenantId}`}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900"
-      >
+      <Link href={backHref} className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900">
         <ArrowLeft size={14} />
-        {schoolName || "Back"}
+        {backLabel}
       </Link>
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">Filtering &amp; Monitoring check</h1>
@@ -131,12 +140,14 @@ export function FilteringCheckDetailView({ tenantId, checkId }: { tenantId: stri
                 ? `Sent to DSL on ${new Date(check.sentToDslAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}`
                 : "Not yet sent to DSL"}
             </p>
-            {!hasDslEmail && <p className="mt-0.5 text-xs text-slate-500">Add a DSL email on this school first.</p>}
+            {!readOnly && !hasDslEmail && <p className="mt-0.5 text-xs text-slate-500">Add a DSL email on this school first.</p>}
           </div>
-          <Button onClick={sendToDsl} disabled={!hasDslEmail || sending} variant={check.sentToDslAt ? "secondary" : "primary"}>
-            <Mail size={15} />
-            {sending ? "Sending…" : check.sentToDslAt ? "Resend to DSL" : "Send to DSL"}
-          </Button>
+          {!readOnly && (
+            <Button onClick={sendToDsl} disabled={!hasDslEmail || sending} variant={check.sentToDslAt ? "secondary" : "primary"}>
+              <Mail size={15} />
+              {sending ? "Sending…" : check.sentToDslAt ? "Resend to DSL" : "Send to DSL"}
+            </Button>
+          )}
         </div>
         {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       </Card>

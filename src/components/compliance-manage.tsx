@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, ExternalLink, Check, Mail } from "lucide-react";
+import Link from "next/link";
+import { ChevronDown, ExternalLink, Check, FileText } from "lucide-react";
 import clsx from "clsx";
 import { ComplianceBadge } from "@/components/badges";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { inputClass, labelClass } from "@/components/ui/input";
 import { isCoreStandard } from "@/lib/dfe-standards";
 import { DfeSourceText } from "@/components/dfe-source-text";
 import { ComplianceLogs } from "@/components/compliance-logs";
+import { SendReportDialog } from "@/components/send-report-dialog";
 import { registerFlush, unregisterFlush } from "@/lib/idle-logout";
 
 type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
@@ -36,8 +38,6 @@ type Standard = { id: string; code: string; title: string; items: Item[] };
 export function ComplianceManage({ tenantId }: { tenantId: string }) {
   const [standards, setStandards] = useState<Standard[] | null>(null);
   const [openItem, setOpenItem] = useState<string | null>(null);
-  const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [emailError, setEmailError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("");
 
   function load() {
@@ -51,25 +51,6 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
 
   useEffect(load, [tenantId]);
 
-  async function emailReport() {
-    setEmailState("sending");
-    setEmailError(null);
-    try {
-      const res = await fetch(`/api/super-admin/tenants/${tenantId}/compliance/report`, { method: "POST" });
-      const body = await res.json();
-      if (!res.ok) {
-        setEmailState("error");
-        setEmailError(body.error ?? "Something went wrong.");
-        return;
-      }
-      setEmailState("sent");
-    } catch {
-      setEmailState("error");
-    } finally {
-      setTimeout(() => setEmailState("idle"), 4000);
-    }
-  }
-
   if (!standards) return <p className="text-sm text-slate-500">Loading…</p>;
 
   const answered = standards.flatMap((s) => s.items).filter((i) => i.assessment.status !== "NOT_STARTED").length;
@@ -82,18 +63,21 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
           <h2 className="font-semibold text-slate-900">Compliance responses</h2>
           <p className="text-xs text-slate-500">{answered}/{total} items answered</p>
         </div>
-        <div className="flex items-center gap-2">
-          {emailError && <p className="text-xs text-red-600">{emailError}</p>}
-          <Button variant="secondary" size="sm" onClick={emailReport} disabled={emailState === "sending"}>
-            <Mail size={13} />
-            {emailState === "sending"
-              ? "Sending…"
-              : emailState === "sent"
-                ? "Sent ✓"
-                : emailState === "error"
-                  ? "Failed"
-                  : "Email report to school"}
-          </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href={`/dashboard/super-admin/${tenantId}/compliance/report`}>
+            <Button variant="secondary" size="sm">
+              <FileText size={13} />
+              View report
+            </Button>
+          </Link>
+          <SendReportDialog
+            endpoint={`/api/super-admin/tenants/${tenantId}/compliance/report`}
+            fetchRecipients={() =>
+              fetch(`/api/super-admin/tenants/${tenantId}`)
+                .then((r) => r.json())
+                .then((t) => t.users ?? [])
+            }
+          />
         </div>
       </div>
       <div className="px-5 pt-3">
