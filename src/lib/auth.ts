@@ -7,12 +7,29 @@ import { authConfig } from "./auth.config";
 import { prisma } from "./db";
 import { verifyTotpCode, consumeBackupCode } from "./totp";
 
-function allowedGoogleDomains(): string[] {
-  return (process.env.GOOGLE_SSO_ALLOWED_DOMAINS ?? "")
-    .split(",")
-    .map((d) => d.trim().toLowerCase())
-    .filter(Boolean);
-}
+// Google sign-in is open to any email domain — the real security boundary
+// is that it only ever works for an email with an existing, active User row
+// (see signIn() below), never self-provisioned. Consumer webmail providers
+// are blocked anyway: those addresses aren't institutionally managed, so a
+// typo'd email when an admin creates an account could otherwise hand access
+// to an unrelated real person who owns that address.
+const BLOCKED_GOOGLE_DOMAINS = new Set([
+  "gmail.com",
+  "googlemail.com",
+  "outlook.com",
+  "hotmail.com",
+  "hotmail.co.uk",
+  "live.com",
+  "msn.com",
+  "yahoo.com",
+  "yahoo.co.uk",
+  "icloud.com",
+  "me.com",
+  "mac.com",
+  "aol.com",
+  "protonmail.com",
+  "proton.me",
+]);
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -57,7 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // Only enabled when AUTH_GOOGLE_ID/AUTH_GOOGLE_SECRET are set — see
     // DEPLOY.md. No account auto-provisioning: Google sign-in only ever
     // works for a User row an admin already created (via the super-admin
-    // panel or the Team page), and only for allow-listed email domains —
+    // panel or the Team page), and never for consumer webmail domains —
     // see signIn().
     ...(process.env.AUTH_GOOGLE_ID
       ? [Google({ authorization: { params: { prompt: "select_account" } } })]
@@ -70,7 +87,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (!user.email) return false;
 
       const domain = user.email.split("@")[1]?.toLowerCase();
-      if (!domain || !allowedGoogleDomains().includes(domain)) return false;
+      if (!domain || BLOCKED_GOOGLE_DOMAINS.has(domain)) return false;
 
       const existing = await prisma.user.findUnique({ where: { email: user.email }, include: { tenant: true } });
       if (!existing || !existing.isActive) return false;

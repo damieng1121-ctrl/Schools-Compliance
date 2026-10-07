@@ -61,11 +61,14 @@ script.
 
 To enable "Sign in with Google" alongside email/password, set
 `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET` (from a Google Cloud OAuth client — see
-`DEPLOY.md`) and `GOOGLE_SSO_ALLOWED_DOMAINS` (comma-separated). It never
-auto-creates accounts: a Google sign-in only succeeds for an email that's
-both on an allowed domain and already has a `User` row (created via
-`/signup` or the Team page) — Google just replaces the password step for
-that existing account.
+`DEPLOY.md`). It never auto-creates accounts: a Google sign-in only succeeds
+for an email that already has a `User` row (created via the super-admin
+panel or a school's Team page) — Google just replaces the password step for
+that existing account. Open to any domain except consumer webmail providers
+(gmail.com, outlook.com, yahoo.com, icloud.com, etc. — see
+`BLOCKED_GOOGLE_DOMAINS` in `src/lib/auth.ts`), since those aren't
+institutionally managed and a typo'd email could otherwise hand access to
+an unrelated person who owns that address.
 
 ## Data model
 

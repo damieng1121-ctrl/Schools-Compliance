@@ -124,17 +124,16 @@ seeding if you want a platform super admin created at the same time.
    echo -n "your-client-id.apps.googleusercontent.com" | gcloud secrets create AUTH_GOOGLE_ID --data-file=-
    echo -n "your-client-secret" | gcloud secrets create AUTH_GOOGLE_SECRET --data-file=-
    ```
-4. Redeploy with the new secrets plus the allowed-domains env var:
+4. Redeploy with the new secrets:
    ```bash
    gcloud run deploy schools-compliance \
      --image europe-west2-docker.pkg.dev/YOUR_PROJECT_ID/schools-compliance/app:latest \
      --region europe-west2 \
-     --update-secrets AUTH_GOOGLE_ID=AUTH_GOOGLE_ID:latest,AUTH_GOOGLE_SECRET=AUTH_GOOGLE_SECRET:latest \
-     --update-env-vars GOOGLE_SSO_ALLOWED_DOMAINS=education-lincs.com
+     --update-secrets AUTH_GOOGLE_ID=AUTH_GOOGLE_ID:latest,AUTH_GOOGLE_SECRET=AUTH_GOOGLE_SECRET:latest
    ```
 
-Google sign-in never auto-creates accounts — see README for how the domain
-allowlist + existing-account check work together.
+Google sign-in never auto-creates accounts — see README for how the
+existing-account check and the consumer-webmail blocklist work together.
 
 ## Gmail SMTP (sending as a Google Workspace mailbox)
 
