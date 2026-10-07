@@ -151,6 +151,11 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
         <p className="break-all rounded-lg bg-slate-50 px-3 py-2 text-center font-mono text-xs text-slate-500">
           {stage.secret}
         </p>
+        {/* Decoy field so browsers that insist on autofilling a "username" into
+            the next text input target this instead of the visible code field —
+            must stay out of display:none/visibility:hidden, which some
+            browsers exclude from autofill targeting. */}
+        <input type="text" name="username" autoComplete="username" value={stage.email} readOnly className="sr-only" tabIndex={-1} aria-hidden />
         <div>
           <label className="block text-xs font-medium text-slate-600">6-digit code</label>
           <input
@@ -184,6 +189,11 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
   if (stage.name === "code") {
     return (
       <form onSubmit={(e) => onCodeSubmit(e, stage)} className="mt-6 space-y-4 text-left">
+        {/* Decoy field so browsers that insist on autofilling a "username" into
+            the next text input target this instead of the visible code field —
+            must stay out of display:none/visibility:hidden, which some
+            browsers exclude from autofill targeting. */}
+        <input type="text" name="username" autoComplete="username" value={stage.email} readOnly className="sr-only" tabIndex={-1} aria-hidden />
         <div>
           <label className="block text-xs font-medium text-slate-600">
             {stage.useBackupCode ? "Backup code" : "Authentication code"}
