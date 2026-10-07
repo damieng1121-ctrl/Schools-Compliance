@@ -13,6 +13,7 @@ import { isCoreStandard } from "@/lib/dfe-standards";
 import { DfeSourceText } from "@/components/dfe-source-text";
 import { ComplianceLogs } from "@/components/compliance-logs";
 import { SendReportDialog } from "@/components/send-report-dialog";
+import { CriteriaTrafficLight, type Criterion } from "@/components/criteria-traffic-light";
 import { registerFlush, unregisterFlush } from "@/lib/idle-logout";
 
 type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
@@ -23,6 +24,7 @@ type Assessment = {
   nextReviewDue: string | null;
   reviewedAt: string | null;
   reviewedByName: string | null;
+  criteriaAnswers: Record<string, string> | null;
 };
 type Item = {
   id: string;
@@ -30,6 +32,7 @@ type Item = {
   description: string;
   sourceText: string | null;
   govLink: string | null;
+  criteria: Criterion[] | null;
   assessment: Assessment;
 };
 type Standard = { id: string; code: string; title: string; items: Item[] };
@@ -139,6 +142,7 @@ function ComplianceManageRow({
   const [notes, setNotes] = useState(item.assessment.evidenceNotes ?? "");
   const [evidenceUrl, setEvidenceUrl] = useState(item.assessment.evidenceUrl ?? "");
   const [nextReviewDue, setNextReviewDue] = useState(item.assessment.nextReviewDue?.slice(0, 10) ?? "");
+  const [criteriaAnswers, setCriteriaAnswers] = useState(item.assessment.criteriaAnswers ?? {});
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
 
@@ -148,7 +152,13 @@ function ComplianceManageRow({
       await fetch(`/api/super-admin/tenants/${tenantId}/compliance/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, evidenceNotes: notes, evidenceUrl, nextReviewDue: nextReviewDue || undefined }),
+        body: JSON.stringify({
+          status,
+          evidenceNotes: notes,
+          evidenceUrl,
+          nextReviewDue: nextReviewDue || undefined,
+          criteriaAnswers,
+        }),
       });
       onSaved();
       setJustSaved(true);
@@ -166,7 +176,8 @@ function ComplianceManageRow({
       status !== item.assessment.status ||
       notes !== (item.assessment.evidenceNotes ?? "") ||
       evidenceUrl !== (item.assessment.evidenceUrl ?? "") ||
-      nextReviewDue !== (item.assessment.nextReviewDue?.slice(0, 10) ?? "");
+      nextReviewDue !== (item.assessment.nextReviewDue?.slice(0, 10) ?? "") ||
+      JSON.stringify(criteriaAnswers) !== JSON.stringify(item.assessment.criteriaAnswers ?? {});
     registerFlush(key, () => (dirty ? save() : undefined));
     return () => unregisterFlush(key);
   });
@@ -207,6 +218,15 @@ function ComplianceManageRow({
                 <DfeSourceText text={item.sourceText} />
               </div>
             </div>
+          )}
+          {item.criteria && item.criteria.length > 0 && (
+            <CriteriaTrafficLight
+              criteria={item.criteria}
+              answers={criteriaAnswers}
+              onChange={(criterionId, value) =>
+                setCriteriaAnswers((prev) => ({ ...prev, [criterionId]: value }))
+              }
+            />
           )}
           {item.assessment.reviewedAt && (
             <p className="text-xs text-slate-400">

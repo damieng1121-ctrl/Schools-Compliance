@@ -47,6 +47,20 @@ function src(parts: { why?: string; how?: string; technical?: string; when?: str
   return sections.join("\n\n---\n\n");
 }
 
+type Rating = "RED" | "AMBER" | "GREEN";
+
+/**
+ * Optional traffic-light technical criterion for an item whose DfE
+ * `sourceText` itself describes a tiered minimum (a generation, a speed) —
+ * levels and ratings are read straight off that item's own `technical`
+ * wording above, never invented.
+ */
+interface Criterion {
+  id: string;
+  label: string;
+  levels: { value: string; label: string; rating: Rating }[];
+}
+
 interface ItemData {
   code: string;
   title: string;
@@ -55,6 +69,7 @@ interface ItemData {
   guidance?: string;
   priority: "HIGH" | "MEDIUM" | "LOW";
   govLink: string;
+  criteria?: Criterion[];
 }
 
 interface StandardData {
@@ -151,6 +166,18 @@ export const STANDARDS: StandardData[] = [
         guidance: "Minimum Wi-Fi 7 (802.11be) on next upgrade.",
         priority: "MEDIUM" as const,
         govLink: link("wireless-network-core-standard", "Use the latest wireless network standards"),
+        criteria: [
+          {
+            id: "wireless-standard-in-use",
+            label: "Wireless standard currently in use",
+            levels: [
+              { value: "legacy", label: "802.11 b/g/n (legacy)", rating: "RED" },
+              { value: "wifi5", label: "Wi-Fi 5 (802.11ac)", rating: "AMBER" },
+              { value: "wifi6", label: "Wi-Fi 6 / 6E (802.11ax)", rating: "AMBER" },
+              { value: "wifi7", label: "Wi-Fi 7 (802.11be) — DfE minimum", rating: "GREEN" },
+            ],
+          },
+        ],
       },
       {
         code: "wireless-signal-coverage",
@@ -227,6 +254,33 @@ export const STANDARDS: StandardData[] = [
         guidance: "Min 1Gbps to desktop; multi-gig for servers/APs; 40Gbps stacking; 2×10Gbps hub-to-core.",
         priority: "HIGH" as const,
         govLink: link("network-switching-core-standard", "The network switches should provide fast, reliable and secure connections to all users both wired and wireless"),
+        criteria: [
+          {
+            id: "desktop-port-speed",
+            label: "Desktop port speed",
+            levels: [
+              { value: "below1g", label: "100Mbps or below 1Gbps", rating: "RED" },
+              { value: "1g", label: "1Gbps or more — DfE minimum", rating: "GREEN" },
+            ],
+          },
+          {
+            id: "stack-interconnect-speed",
+            label: "Stack interconnect (where switches are stacked)",
+            levels: [
+              { value: "not-stacked", label: "Not stacked", rating: "AMBER" },
+              { value: "below40g", label: "Stacked, interconnect below 40Gbps", rating: "RED" },
+              { value: "40g-dac", label: "40Gbps dedicated stacking ports (e.g. DAC)", rating: "GREEN" },
+            ],
+          },
+          {
+            id: "hub-to-core-uplink",
+            label: "Hub room to core server room uplink",
+            levels: [
+              { value: "below2x10g", label: "Below 2×10Gbps", rating: "RED" },
+              { value: "2x10g", label: "2×10Gbps or more, diverse routes — DfE minimum", rating: "GREEN" },
+            ],
+          },
+        ],
       },
       {
         code: "switches-central-management",

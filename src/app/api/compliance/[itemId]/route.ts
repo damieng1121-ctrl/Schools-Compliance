@@ -10,7 +10,25 @@ const bodySchema = z.object({
   evidenceNotes: z.string().max(2000).optional(),
   evidenceUrl: z.string().url().optional().or(z.literal("")),
   nextReviewDue: z.string().optional(), // ISO date
+  criteriaAnswers: z.record(z.string(), z.string()).optional(),
 });
+
+type CriterionDef = { id: string; levels: { value: string }[] };
+
+/** Drops any answer that doesn't name one of this item's own criteria/levels, so stray input can't corrupt the stored JSON. */
+function sanitizeCriteriaAnswers(
+  answers: Record<string, string> | undefined,
+  criteria: unknown,
+): Record<string, string> | undefined {
+  if (!answers) return undefined;
+  const defs = Array.isArray(criteria) ? (criteria as CriterionDef[]) : [];
+  const result: Record<string, string> = {};
+  for (const def of defs) {
+    const value = answers[def.id];
+    if (value && def.levels.some((l) => l.value === value)) result[def.id] = value;
+  }
+  return result;
+}
 
 export async function PUT(req: Request, { params }: Params) {
   return withApiErrors(async () => {
@@ -26,6 +44,7 @@ export async function PUT(req: Request, { params }: Params) {
     const evidenceNotes = body.evidenceNotes || null;
     const evidenceUrl = body.evidenceUrl || null;
     const nextReviewDue = body.nextReviewDue ? new Date(body.nextReviewDue) : null;
+    const criteriaAnswers = sanitizeCriteriaAnswers(body.criteriaAnswers, item.criteria);
 
     const assessment = await prisma.complianceAssessment.upsert({
       where: { tenantId_itemId: { tenantId: session.user.tenantId, itemId } },
@@ -36,6 +55,7 @@ export async function PUT(req: Request, { params }: Params) {
         evidenceNotes,
         evidenceUrl,
         nextReviewDue,
+        ...(criteriaAnswers && { criteriaAnswers }),
         reviewedById: session.user.id,
         reviewedAt: new Date(),
       },
@@ -44,6 +64,7 @@ export async function PUT(req: Request, { params }: Params) {
         evidenceNotes,
         evidenceUrl,
         nextReviewDue,
+        ...(criteriaAnswers && { criteriaAnswers }),
         reviewedById: session.user.id,
         reviewedAt: new Date(),
       },
@@ -56,7 +77,8 @@ export async function PUT(req: Request, { params }: Params) {
       previous.status !== body.status ||
       (previous.evidenceNotes ?? null) !== evidenceNotes ||
       (previous.evidenceUrl ?? null) !== evidenceUrl ||
-      (previous.nextReviewDue?.toISOString() ?? null) !== (nextReviewDue?.toISOString() ?? null);
+      (previous.nextReviewDue?.toISOString() ?? null) !== (nextReviewDue?.toISOString() ?? null) ||
+      (criteriaAnswers && JSON.stringify(previous?.criteriaAnswers ?? {}) !== JSON.stringify(criteriaAnswers));
 
     if (changed) {
       await prisma.auditLog.create({
@@ -74,6 +96,7 @@ export async function PUT(req: Request, { params }: Params) {
             evidenceNotes,
             evidenceUrl,
             nextReviewDue: nextReviewDue?.toISOString() ?? null,
+            ...(criteriaAnswers && { criteriaAnswers }),
           },
         },
       });

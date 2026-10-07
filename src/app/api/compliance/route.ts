@@ -31,6 +31,7 @@ export async function GET() {
           evidenceUrl: null,
           nextReviewDue: null,
           reviewedAt: null,
+          criteriaAnswers: null,
         },
       })),
     }));

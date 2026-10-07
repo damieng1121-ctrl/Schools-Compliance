@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { STANDARDS } from "./dfe-catalogue";
 
@@ -97,10 +97,11 @@ async function seedComplianceCatalogue() {
     });
 
     for (const [itemOrder, item] of standard.items.entries()) {
+      const criteria = item.criteria as Prisma.InputJsonValue | undefined;
       await prisma.complianceItem.upsert({
         where: { standardId_code: { standardId: created.id, code: item.code } },
-        create: { ...item, standardId: created.id, order: itemOrder },
-        update: { ...item, order: itemOrder },
+        create: { ...item, standardId: created.id, order: itemOrder, criteria },
+        update: { ...item, order: itemOrder, criteria },
       });
     }
   }

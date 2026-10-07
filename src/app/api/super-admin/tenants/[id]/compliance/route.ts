@@ -39,6 +39,7 @@ export async function GET(_req: Request, { params }: Params) {
             nextReviewDue: a?.nextReviewDue ?? null,
             reviewedAt: a?.reviewedAt ?? null,
             reviewedByName: a?.reviewedBy?.name ?? a?.reviewedBy?.email ?? null,
+            criteriaAnswers: a?.criteriaAnswers ?? null,
           },
         };
       }),

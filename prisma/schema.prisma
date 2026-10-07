@@ -129,6 +129,12 @@ model ComplianceItem {
   priority    Priority           @default(MEDIUM)
   /// Deep link to the specific DfE guidance sub-page for this item, if more specific than the standard's officialUrl
   govLink     String?
+  /// Optional traffic-light technical criteria for items where the DfE
+  /// standard itself describes a tiered minimum (e.g. wireless generation,
+  /// switch interconnect speed) — JSON array of
+  /// `{ id, label, levels: [{ value, label, rating: "RED"|"AMBER"|"GREEN" }] }`.
+  /// Levels/ratings are drawn from this item's own `sourceText`, not invented.
+  criteria    Json?
 
   assessments ComplianceAssessment[]
 
@@ -153,6 +159,9 @@ model ComplianceAssessment {
   status        ComplianceStatus @default(NOT_STARTED)
   evidenceNotes String?          @db.Text
   evidenceUrl   String?
+  /// This tenant's answer to each of the item's `criteria`, if any —
+  /// `{ [criterionId]: levelValue }`.
+  criteriaAnswers Json?
 
   reviewedById  String?
   reviewedBy    User?     @relation(fields: [reviewedById], references: [id])
