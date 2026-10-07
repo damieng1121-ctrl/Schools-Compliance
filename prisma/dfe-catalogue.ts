@@ -276,8 +276,21 @@ export const STANDARDS: StandardData[] = [
             id: "hub-to-core-uplink",
             label: "Hub room to core server room uplink",
             levels: [
-              { value: "below2x10g", label: "Below 2×10Gbps", rating: "RED" },
-              { value: "2x10g", label: "2×10Gbps or more, diverse routes — DfE minimum", rating: "GREEN" },
+              {
+                value: "1g",
+                label: "1Gbps — absolute minimum (small remote cabinets, under 24–48 light-usage users, or legacy hardware only)",
+                rating: "RED",
+              },
+              {
+                value: "10g",
+                label: "10Gbps — enterprise standard baseline (minimum for any standard 48-port access switch stack, to avoid oversubscription)",
+                rating: "AMBER",
+              },
+              {
+                value: "25g-40g",
+                label: "25–40Gbps+ — required for high-density cabinets, heavily utilised switch stacks, or data centres",
+                rating: "GREEN",
+              },
             ],
           },
         ],
