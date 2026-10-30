@@ -13,7 +13,7 @@ export async function GET(_req: Request, { params }: Params) {
     const tenant = await prisma.tenant.findUnique({ where: { id }, select: { id: true } });
     if (!tenant) throw new AuthError("School not found", 404);
 
-    const [standards, assessments] = await Promise.all([
+    const [standards, assessments, evidence] = await Promise.all([
       prisma.complianceStandard.findMany({
         orderBy: { order: "asc" },
         include: { items: { orderBy: { order: "asc" } } },
@@ -22,27 +22,40 @@ export async function GET(_req: Request, { params }: Params) {
         where: { tenantId: id },
         include: { reviewedBy: { select: { name: true, email: true } } },
       }),
+      prisma.standardEvidence.findMany({
+        where: { tenantId: id },
+        include: { updatedBy: { select: { name: true, email: true } } },
+      }),
     ]);
 
     const assessmentByItem = new Map(assessments.map((a) => [a.itemId, a]));
+    const evidenceByStandard = new Map(evidence.map((e) => [e.standardId, e]));
 
-    return standards.map((standard) => ({
-      ...standard,
-      items: standard.items.map((item) => {
-        const a = assessmentByItem.get(item.id);
-        return {
-          ...item,
-          assessment: {
-            status: a?.status ?? ("NOT_STARTED" as const),
-            evidenceNotes: a?.evidenceNotes ?? null,
-            evidenceUrl: a?.evidenceUrl ?? null,
-            nextReviewDue: a?.nextReviewDue ?? null,
-            reviewedAt: a?.reviewedAt ?? null,
-            reviewedByName: a?.reviewedBy?.name ?? a?.reviewedBy?.email ?? null,
-            criteriaAnswers: a?.criteriaAnswers ?? null,
-          },
-        };
-      }),
-    }));
+    return standards.map((standard) => {
+      const ev = evidenceByStandard.get(standard.id);
+      return {
+        ...standard,
+        evidence: {
+          evidenceUrl: ev?.evidenceUrl ?? null,
+          updatedAt: ev?.updatedAt ?? null,
+          updatedByName: ev?.updatedBy?.name ?? ev?.updatedBy?.email ?? null,
+        },
+        items: standard.items.map((item) => {
+          const a = assessmentByItem.get(item.id);
+          return {
+            ...item,
+            assessment: {
+              status: a?.status ?? ("NOT_STARTED" as const),
+              technicianNotes: a?.technicianNotes ?? null,
+              sltNotes: a?.sltNotes ?? null,
+              nextReviewDue: a?.nextReviewDue ?? null,
+              reviewedAt: a?.reviewedAt ?? null,
+              reviewedByName: a?.reviewedBy?.name ?? a?.reviewedBy?.email ?? null,
+              criteriaAnswers: a?.criteriaAnswers ?? null,
+            },
+          };
+        }),
+      };
+    });
   });
 }

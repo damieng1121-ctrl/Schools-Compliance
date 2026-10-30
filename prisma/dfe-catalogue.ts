@@ -61,6 +61,8 @@ interface Criterion {
   levels: { value: string; label: string; rating: Rating }[];
 }
 
+type Audience = "TECHNICIAN" | "SLT" | "DSL";
+
 interface ItemData {
   code: string;
   title: string;
@@ -69,6 +71,8 @@ interface ItemData {
   guidance?: string;
   priority: "HIGH" | "MEDIUM" | "LOW";
   govLink: string;
+  /** Who's responsible for answering this item — lets the checklist be filtered by role. */
+  audience: Audience;
   criteria?: Criterion[];
 }
 
@@ -94,6 +98,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "full-fibre-connection",
+        audience: "TECHNICIAN",
         title: "Schools and colleges should use a full fibre connection for their broadband service",
         description:
           "In plain English: get the fastest connection you can afford, and make sure it's \"full fibre\" (sometimes called a leased line or FTTP) rather than an old copper line — copper doesn't meet this standard at all. Primary schools need at least 100Mbps download / 30Mbps upload; secondary schools, all-through schools and colleges need enough capacity for 1Gbps both ways.",
@@ -110,6 +115,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "backup-broadband-connection",
+        audience: "TECHNICIAN",
         title: "Schools and colleges should have a backup broadband connection to ensure resilience and maintain continuity of service",
         description:
           "In plain English: don't rely on a single internet line. If it fails, you need a second connection (of a different type, e.g. a leased line plus a mobile/satellite backup) that switches over automatically, plus backup power for the core network kit, so the school doesn't lose the internet the moment one thing breaks.",
@@ -126,6 +132,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "broadband-security-safeguarding",
+        audience: "DSL",
         title: "Schools and colleges should have appropriate IT security and safeguarding systems in place, under both child and data protection legislation",
         description:
           "In plain English: your broadband needs to come with a content filtering system that meets the Keeping Children Safe in Education rules, plus a firewall — whether that's a box on-site or a service run by your broadband provider.",
@@ -153,6 +160,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "latest-wireless-standard",
+        audience: "TECHNICIAN",
         title: "Use the latest wireless network standards",
         description:
           "In plain English: when you next upgrade, the new Wi-Fi kit should use Wi-Fi 7 as a minimum, not whatever was current when the old kit was bought.",
@@ -181,6 +189,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "wireless-signal-coverage",
+        audience: "TECHNICIAN",
         title: "Have a fully functional signal from your wireless network throughout the school or college buildings and externally where required",
         description:
           "In plain English: every classroom should have a working signal — up to one access point per room as a rule of thumb, with stronger units in halls and other high-capacity spaces. Your provider should have actually surveyed the building (\"heat mapping\"), not guessed.",
@@ -197,6 +206,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "wireless-central-management",
+        audience: "TECHNICIAN",
         title: "Have a solution that can centrally manage the wireless network",
         description:
           "In plain English: your IT support (internal or external) should be able to see and configure every access point from one screen, get alerted the moment one fails, and have security updates roll out automatically.",
@@ -212,6 +222,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "wireless-security-features",
+        audience: "TECHNICIAN",
         title: "Install security features to stop unauthorised access",
         description:
           "In plain English: nobody should be able to join your Wi-Fi without proper authentication. In practice this means separate staff/student/guest networks (VLANs), WPA3 encryption, and extra protection like MFA for IT admin accounts — because an open wireless network can let an outsider straight into school data.",
@@ -241,6 +252,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "switches-fast-reliable-secure",
+        audience: "TECHNICIAN",
         title: "The network switches should provide fast, reliable and secure connections to all users both wired and wireless",
         description:
           "In plain English: every desktop connection should run at least 1Gbps, with faster multi-gigabit ports for things that need more (servers, Wi-Fi access points). Anything that powers other devices over the network cable (Wi-Fi points, CCTV, phones) must comply with the manufacturer's power spec.",
@@ -297,6 +309,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "switches-central-management",
+        audience: "TECHNICIAN",
         title: "Have a platform that can centrally manage the network switching infrastructure",
         description:
           "In plain English: your supplier or IT support needs one tool to configure and monitor every switch and get alerted when something fails, plus a minimum 5-year manufacturer warranty, with training for whoever administers it on site.",
@@ -313,6 +326,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "switches-security-features",
+        audience: "TECHNICIAN",
         title: "The network switches should have security features to protect users and data from unauthorised access",
         description:
           "In plain English: network access controls so only recognised devices get onto the network, with configuration changes locked down to named, documented admin accounts.",
@@ -328,6 +342,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "core-switches-ups",
+        audience: "TECHNICIAN",
         title: "Core network switches should be connected to at least one UPS to reduce the impact of outages",
         description:
           "In plain English: the switches everything else depends on shouldn't have a single point of failure — 2 power supplies, 2 management modules, 2 links to other critical kit, and at least one battery backup (UPS) so a power blip doesn't take the whole network down.",
@@ -358,6 +373,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "copper-cat6a",
+        audience: "TECHNICIAN",
         title: "Copper cabling should be Category 6A (Cat 6A)",
         description:
           "In plain English: any new or replaced copper network cable should be Cat 6A, run no further than 90m with no joins in the middle, and fitted to the correct fire-safety rating.",
@@ -374,6 +390,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "fibre-om4",
+        audience: "TECHNICIAN",
         title: "Optical fibre cabling should be a minimum 16 core multi-mode OM4",
         description:
           "In plain English: cabling that links buildings or server/comms rooms together should be OM4 fibre, at least 16 cores, ideally run through underground ducts for protection, with a backup route for anything critical.",
@@ -390,6 +407,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "cabling-install-test-warranty",
+        audience: "TECHNICIAN",
         title: "New cabling should be installed and tested in line with the manufacturer's guidance, warranty terms and conditions",
         description:
           "In plain English: new cabling should go in via a manufacturer-approved installer, come with a test report proving it works, and carry a 20-year performance warranty on the whole system — not just the cable itself.",
@@ -419,6 +437,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "cyber-risk-assessment",
+        audience: "SLT",
         title: "Conduct a cyber risk assessment annually and review every term",
         description:
           "In plain English: once a year, work out what your biggest cyber risks actually are (not a generic checklist) and put a response plan in place; then every term, check whether anything's changed enough to revisit it.",
@@ -434,6 +453,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "cyber-awareness-plan",
+        audience: "SLT",
         title: "Create and implement a cyber awareness plan for students and staff",
         description:
           "In plain English: have a written acceptable use policy and give everyone — staff, students, governors, supply/agency staff with logins — annual cyber training covering phishing, passwords, and how to report an incident. If you have RPA cover, that training must be the free NCSC one, taken every year.",
@@ -450,6 +470,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "anti-malware-firewall",
+        audience: "TECHNICIAN",
         title: "Secure digital technology and data with anti-malware and a firewall",
         description:
           "In plain English: every device needs a properly configured firewall and centrally-managed, up-to-date anti-malware software. USB storage should be blocked by default. Firewall admin access needs MFA, and inbound traffic should be blocked by default unless there's a documented reason to allow it.",
@@ -465,6 +486,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "user-accounts-access-privileges",
+        audience: "SLT",
         title: "Control and secure user accounts and access privileges",
         description:
           "In plain English: unique logins for everyone, strong passwords, and multi-factor authentication (MFA) switched on for all staff cloud/remote-access accounts and all IT admin accounts. Accounts should be reviewed every term, and disabled the moment someone leaves.",
@@ -481,6 +503,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "license-update-technology",
+        audience: "TECHNICIAN",
         title: "License digital technology and keep it up to date",
         description:
           "In plain English: nothing unlicensed, and nothing left unpatched. High/critical-severity fixes must go on within 14 days of release. Unsupported software/operating systems should be flagged for replacement before they go out of support.",
@@ -497,6 +520,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "backup-data-plan",
+        audience: "SLT",
         title: "Develop and implement a plan to back up your data and review this every year",
         description:
           "In plain English: the classic \"3-2-1\" rule — at least 3 copies of important data, on at least 2 different devices, with at least 1 copy offsite (cloud counts). Backups need to be immutable (can't be altered once written) and tested regularly by actually restoring from them, not just assumed to work.",
@@ -513,6 +537,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "report-cyber-attacks",
+        audience: "SLT",
         title: "Report cyber attacks",
         description:
           "In plain English: everyone — staff and students — should know how to report a suspected cyber incident to IT support and the SLT digital lead immediately. Serious incidents also need reporting externally: to your RPA/cyber insurer, Action Fraud, DfE's sector cyber team, and sometimes the NCSC or ICO too.",
@@ -543,6 +568,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "filtering-roles-responsibilities",
+        audience: "DSL",
         title: "Identify and assign roles and responsibilities to manage your filtering and monitoring systems",
         description:
           "In plain English: someone on SLT and a governor need to own this, and it needs to be clear who in IT support and who as DSL does what — not left vague between the two.",
@@ -558,6 +584,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "filtering-annual-review",
+        audience: "DSL",
         title: "Review your filtering and monitoring provision at least annually",
         description:
           "In plain English: once a year (minimum), SLT + DSL + IT support + a governor sit down and actually test what's blocked, what's not, and whether it still matches the school's real risk profile — and write down what they found.",
@@ -574,6 +601,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "filtering-blocks-harmful-content",
+        audience: "DSL",
         title: "Filtering systems should block harmful and inappropriate content without unreasonably impacting teaching and learning",
         description:
           "In plain English: your filtering provider must be a member of the Internet Watch Foundation and signed up to CTIRU, and those blocklists must not be switchable-off by anyone, including IT admins. Filtering has to cover every school-managed device and BYOD device on a separate network, and block workarounds like VPNs and proxies.",
@@ -590,6 +618,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "monitoring-strategies",
+        audience: "DSL",
         title: "Have effective monitoring strategies that meet the safeguarding needs of your school or college",
         description:
           "In plain English: monitoring doesn't block anything — it watches and reports. You need at least weekly reports plus same-day alerts for anything high-risk, a documented process for who acts on what, and everyone needs to know devices are being monitored.",
@@ -620,6 +649,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "slt-digital-lead",
+        audience: "SLT",
         title: "Assign a senior leadership team (SLT) member to be responsible for digital technology",
         description:
           "In plain English: name one person on SLT (the \"SLT digital lead\") who owns the digital technology strategy, links IT support/DPO/DSL/finance together, and is accountable for training and IT support's effectiveness. They don't need to be technical.",
@@ -633,6 +663,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "hardware-registers-up-to-date",
+        audience: "SLT",
         title: "Keep registers relating to hardware and systems up to date",
         description:
           "In plain English: three live registers — contracts (licences/subscriptions/renewal dates), assets (every device, serial number, owner, age, disposal date) and information assets (what personal data lives where). DfE has free templates for all three on the plan technology for your school service.",
@@ -646,6 +677,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "disaster-recovery-business-continuity",
+        audience: "SLT",
         title: "Include digital technology within disaster recovery and business continuity plans",
         description:
           "In plain English: write down what counts as a \"disaster\" for your IT, who's on the response team and how to reach them, and test the plan at least once a year. Keep a copy both printed and in a secure cloud folder — if your systems are down, you need the plan to still be readable.",
@@ -659,6 +691,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "digital-technology-strategy",
+        audience: "SLT",
         title: "Have a digital technology strategy that is reviewed every year",
         description:
           "In plain English: a written, minimum 2-year digital strategy that actually supports the school's development plan — not bought because a salesperson was convincing. Review it every year. You should only start this once the SLT digital lead role, registers, and disaster recovery plan (the 3 standards above) are already in place.",
@@ -687,6 +720,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "server-resilience",
+        audience: "TECHNICIAN",
         title: "All servers and related storage platforms should continue to work if any single component or service fails",
         description:
           "In plain English: a server holding anything critical needs dual power supplies, a UPS with at least 30 minutes' runtime, mirrored/redundant disks, and regular backups — so one failed part doesn't take the whole thing down.",
@@ -703,6 +737,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "server-secure-data-protection",
+        audience: "TECHNICIAN",
         title: "Servers and related storage platforms must be secure and follow data protection legislation",
         description:
           "In plain English: servers have to be \"secure by design\" — which in practice means following the NCSC's 10 Steps to Cyber Security, running a data protection impact assessment on anything holding personal data, and having a clear joiner/leaver account process.",
@@ -718,6 +753,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "server-energy-efficiency",
+        audience: "TECHNICIAN",
         title: "All servers and related storage platforms should be energy-efficient and set up to reduce power consumption, while still meeting user needs",
         description:
           "In plain English: power-save servers when idle (as long as it doesn't hurt backups or performance), and when buying new ones specify ENERGY STAR or equivalent — don't buy more capacity than you actually need.",
@@ -733,6 +769,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "server-physical-environment",
+        audience: "TECHNICIAN",
         title: "All server and related storage platforms should be kept and used in an appropriate physical environment",
         description:
           "In plain English: servers need a dedicated, locked room meeting legal size minimums (3.4m deep × 2.2m wide for one cabinet, bigger for more), no windows, no classroom access, no liquids, isolated UPS power, and proper cooling. Laptops and other battery devices can't be stored in there (fire risk).",
@@ -763,6 +800,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "cloud-alternative-to-servers",
+        audience: "TECHNICIAN",
         title: "Use cloud solutions as an alternative to locally-hosted systems, including servers",
         description:
           "In plain English: before buying or renewing a local server, check whether a cloud service could do the job instead — it's usually cheaper, more resilient, and less work to maintain. Some things (door access control, cashless catering) may still need a local server.",
@@ -778,6 +816,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "cloud-data-protection-legislation",
+        audience: "SLT",
         title: "Cloud solutions must follow data protection legislation",
         description:
           "In plain English: any cloud service storing personal data needs a data protection impact assessment, a data sharing agreement that commits the provider to telling you promptly about a breach, and data should stay in the UK/EU unless you've checked the transfer is UK GDPR-compliant.",
@@ -793,6 +832,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "cloud-id-access-management",
+        audience: "TECHNICIAN",
         title: "Cloud solutions should use ID and access management tools",
         description:
           "In plain English: one login per user across all your cloud services (single sign-on), rather than a different password for every tool — it's easier to secure, and easier to switch off access the moment someone leaves.",
@@ -808,6 +848,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "cloud-availability-range-of-devices",
+        audience: "TECHNICIAN",
         title: "Cloud solutions should work on a range of devices and be available when needed",
         description:
           "In plain English: before signing up to a cloud service, trial it and check its advertised uptime (\"availability\") properly — the difference between 99% and 99.9% is the difference between about 7 hours and 45 minutes of downtime a month, which matters a lot.",
@@ -824,6 +865,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "cloud-data-backup",
+        audience: "TECHNICIAN",
         title: "Make sure that appropriate data backup provision is in place",
         description:
           "In plain English: don't assume your cloud provider backs up your data forever — some only keep backups for 30 days. Ask what they back up, where, for how long, and how often, and for anything critical, use the 3-2-1 rule (3 copies, 2 devices, 1 offsite) on top of what the provider gives you.",
@@ -854,6 +896,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "accessibility-in-strategies-policies",
+        audience: "SLT",
         title: "Include digital accessibility in relevant strategies and policies",
         description:
           "In plain English: when you next review your digital technology strategy, curriculum policy or SEND policy, explicitly write in how you'll meet people's accessibility needs — don't leave it as an afterthought.",
@@ -867,6 +910,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "hardware-software-accessibility-features",
+        audience: "TECHNICIAN",
         title: "Hardware and software should support the use of accessibility features",
         description:
           "In plain English: 1 in 5 people in the UK have a disability. The devices and software you already own likely have built-in accessibility features (text-to-speech, captions, zoom, translation) — make sure your security settings don't accidentally block them, and that staff know how to switch them on.",
@@ -880,6 +924,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "accessible-communications",
+        audience: "SLT",
         title: "Communications should be accessible to all",
         description:
           "In plain English: the school website and any communication to parents (emails, texts, letters) should be usable by people with additional needs, disabilities, or EAL — staff should know who to ask (SENCo, IT support, or the SLT digital lead) when something needs making accessible.",
@@ -907,6 +952,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "itsupport-meets-standards",
+        audience: "SLT",
         title: "Make sure IT support helps you meet the digital and technology standards",
         description:
           "In plain English: your IT support's day-to-day work and planning decisions should be actively pointed at the 6 core DfE standards, not just general troubleshooting — and your digital strategy review should check progress against them.",
@@ -920,6 +966,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "itsupport-maintains-improves",
+        audience: "SLT",
         title: "Make sure IT support actively maintains and improves your digital technology in line with your digital strategy",
         description:
           "In plain English: IT support's job isn't just fixing things when they break — it includes keeping asset registers up to date, applying security patches, maintaining backups and filtering/monitoring systems, and planning upgrades with the SLT digital lead.",
@@ -935,6 +982,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "itsupport-responsive-service-expectations",
+        audience: "SLT",
         title: "Make sure your IT support is responsive and meets agreed service expectations",
         description:
           "In plain English: agree (and write down) how quickly IT support should respond to and resolve issues, how requests are prioritised, and how serious incidents get escalated. Every request should be logged and tracked — not handled through informal messages that go unrecorded.",
@@ -950,6 +998,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "itsupport-annual-review",
+        audience: "SLT",
         title: "Review your IT support at least once a year",
         description:
           "In plain English: once a year, check what IT support you have, whether it's performing, and whether it's good value — not just the cheapest option, but one that's reliable during busy periods and fits your budget. Report the findings to SLT, the business manager, and governors.",
@@ -963,6 +1012,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "itsupport-staff-training-guidance",
+        audience: "SLT",
         title: "Make sure staff get clear guidance and training on using technology",
         description:
           "In plain English: every new staff member gets induction training on the key systems (MIS, safeguarding platforms, parental comms) plus annual refreshers and cyber security awareness training, and there's clear, plain-English written guidance for common tasks like logging in or resetting a password.",
@@ -992,6 +1042,7 @@ export const STANDARDS: StandardData[] = [
     items: [
       {
         code: "devices-meet-educational-needs",
+        audience: "SLT",
         title: "Devices should meet educational needs and support the digital technology strategy",
         description:
           "In plain English: don't buy devices because they're cheap or because of a sales pitch — follow a 3-step process: have a digital technology strategy, work out what students/staff actually need devices for, then assess the security/technical requirements before deciding to buy new or repurpose what you have.",
@@ -1005,6 +1056,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "devices-safe-secure",
+        audience: "TECHNICIAN",
         title: "Devices should be safe and secure",
         description:
           "In plain English: every device needs a firewall, VLANs, managed anti-virus, an enterprise/education-grade OS with security patches, and to meet the KCSIE filtering/monitoring rules — and should be centrally managed so IT support can remotely lock or wipe a lost or stolen one.",
@@ -1020,6 +1072,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "devices-minimum-requirements",
+        audience: "TECHNICIAN",
         title: "Devices should meet or exceed the minimum requirements",
         description:
           "In plain English — the actual minimum spec table DfE publishes: enterprise/education-grade OS; 5 years of security patches for laptops/desktops (3 years for tablets); 3-year warranty for laptops/desktops (2 years for tablets); Wi-Fi 802.11ac Wave 2 minimum (Wi-Fi 6 recommended); tablets need at least a 9.7-inch screen. Anything failing the OS requirement should be replaced now.",
@@ -1036,6 +1089,7 @@ export const STANDARDS: StandardData[] = [
       },
       {
         code: "devices-energy-sustainable-disposal",
+        audience: "TECHNICIAN",
         title: "Make sure devices are energy efficient, and they are bought and disposed of sustainably",
         description:
           "In plain English: switch off devices when not in use, buy Energy Star-rated devices where possible, and when disposing of old ones, follow WEEE regulations and get certificates proving data was securely destroyed and the waste handled legally.",

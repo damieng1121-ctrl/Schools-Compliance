@@ -14,13 +14,16 @@ import { DfeSourceText } from "@/components/dfe-source-text";
 import { ComplianceLogs } from "@/components/compliance-logs";
 import { SendReportDialog } from "@/components/send-report-dialog";
 import { CriteriaTrafficLight, type Criterion } from "@/components/criteria-traffic-light";
+import { AudienceBadge, type Audience } from "@/components/audience-badge";
+import { AudienceFilter, type AudienceOrAll } from "@/components/audience-filter";
+import { StandardEvidenceArea } from "@/components/standard-evidence-area";
 import { registerFlush, unregisterFlush } from "@/lib/idle-logout";
 
 type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
 type Assessment = {
   status: Status;
-  evidenceNotes: string | null;
-  evidenceUrl: string | null;
+  technicianNotes: string | null;
+  sltNotes: string | null;
   nextReviewDue: string | null;
   reviewedAt: string | null;
   reviewedByName: string | null;
@@ -32,16 +35,19 @@ type Item = {
   description: string;
   sourceText: string | null;
   govLink: string | null;
+  audience: Audience;
   criteria: Criterion[] | null;
   assessment: Assessment;
 };
-type Standard = { id: string; code: string; title: string; items: Item[] };
+type StandardEvidence = { evidenceUrl: string | null; updatedAt: string | null; updatedByName: string | null };
+type Standard = { id: string; code: string; title: string; evidence: StandardEvidence; items: Item[] };
 
 /** Editable view of a school's compliance answers, for platform admins to fill in on a school's behalf. */
 export function ComplianceManage({ tenantId }: { tenantId: string }) {
   const [standards, setStandards] = useState<Standard[] | null>(null);
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("");
+  const [audienceFilter, setAudienceFilter] = useState<AudienceOrAll>("ALL");
 
   function load() {
     fetch(`/api/super-admin/tenants/${tenantId}/compliance`)
@@ -58,6 +64,9 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
 
   const answered = standards.flatMap((s) => s.items).filter((i) => i.assessment.status !== "NOT_STARTED").length;
   const total = standards.reduce((n, s) => n + s.items.length, 0);
+
+  const visibleItems = (standard: Standard) =>
+    audienceFilter === "ALL" ? standard.items : standard.items.filter((i) => i.audience === audienceFilter);
 
   return (
     <Card>
@@ -83,15 +92,22 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
           />
         </div>
       </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-3">
+        <p className="text-xs font-medium text-slate-500">Show items for</p>
+        <AudienceFilter value={audienceFilter} onChange={setAudienceFilter} />
+      </div>
       <div className="px-5 pt-3">
         <Tabs
           tabs={[
-            ...standards.map((standard) => ({
-              id: standard.id,
-              label: standard.title,
-              meta: `${standard.items.filter((i) => i.assessment.status !== "NOT_STARTED").length}/${standard.items.length}`,
-              flagged: isCoreStandard(standard.code),
-            })),
+            ...standards.map((standard) => {
+              const items = visibleItems(standard);
+              return {
+                id: standard.id,
+                label: standard.title,
+                meta: `${items.filter((i) => i.assessment.status !== "NOT_STARTED").length}/${items.length}`,
+                flagged: isCoreStandard(standard.code),
+              };
+            }),
             { id: "logs", label: "Activity log" },
           ]}
           active={activeTab}
@@ -102,12 +118,16 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
       {activeTab === "logs" ? (
         <ComplianceLogs endpoint={`/api/super-admin/tenants/${tenantId}/compliance/logs`} />
       ) : (
-        <div className="divide-y divide-slate-100">
-          {standards
-            .filter((standard) => standard.id === activeTab)
-            .map((standard) => (
-              <div key={standard.id}>
-                {standard.items.map((item) => (
+        standards
+          .filter((standard) => standard.id === activeTab)
+          .map((standard) => (
+            <div key={standard.id}>
+              <StandardEvidenceArea
+                endpoint={`/api/super-admin/tenants/${tenantId}/compliance/evidence/${standard.id}`}
+                evidence={standard.evidence}
+              />
+              <div className="divide-y divide-slate-100">
+                {visibleItems(standard).map((item) => (
                   <ComplianceManageRow
                     key={item.id}
                     tenantId={tenantId}
@@ -117,9 +137,12 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
                     onSaved={load}
                   />
                 ))}
+                {visibleItems(standard).length === 0 && (
+                  <p className="px-5 py-6 text-sm text-slate-500">No items for this role under this standard.</p>
+                )}
               </div>
-            ))}
-        </div>
+            </div>
+          ))
       )}
     </Card>
   );
@@ -139,8 +162,8 @@ function ComplianceManageRow({
   onSaved: () => void;
 }) {
   const [status, setStatus] = useState(item.assessment.status);
-  const [notes, setNotes] = useState(item.assessment.evidenceNotes ?? "");
-  const [evidenceUrl, setEvidenceUrl] = useState(item.assessment.evidenceUrl ?? "");
+  const [technicianNotes, setTechnicianNotes] = useState(item.assessment.technicianNotes ?? "");
+  const [sltNotes, setSltNotes] = useState(item.assessment.sltNotes ?? "");
   const [nextReviewDue, setNextReviewDue] = useState(item.assessment.nextReviewDue?.slice(0, 10) ?? "");
   const [criteriaAnswers, setCriteriaAnswers] = useState(item.assessment.criteriaAnswers ?? {});
   const [saving, setSaving] = useState(false);
@@ -154,8 +177,8 @@ function ComplianceManageRow({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           status,
-          evidenceNotes: notes,
-          evidenceUrl,
+          technicianNotes,
+          sltNotes,
           nextReviewDue: nextReviewDue || undefined,
           criteriaAnswers,
         }),
@@ -174,19 +197,24 @@ function ComplianceManageRow({
     const key = `super-admin-compliance-item-${tenantId}-${item.id}`;
     const dirty =
       status !== item.assessment.status ||
-      notes !== (item.assessment.evidenceNotes ?? "") ||
-      evidenceUrl !== (item.assessment.evidenceUrl ?? "") ||
+      technicianNotes !== (item.assessment.technicianNotes ?? "") ||
+      sltNotes !== (item.assessment.sltNotes ?? "") ||
       nextReviewDue !== (item.assessment.nextReviewDue?.slice(0, 10) ?? "") ||
       JSON.stringify(criteriaAnswers) !== JSON.stringify(item.assessment.criteriaAnswers ?? {});
     registerFlush(key, () => (dirty ? save() : undefined));
     return () => unregisterFlush(key);
   });
 
+  const notesLabel = item.audience === "TECHNICIAN" ? "Technician notes" : "SLT notes";
+  const notesValue = item.audience === "TECHNICIAN" ? technicianNotes : sltNotes;
+  const setNotesValue = item.audience === "TECHNICIAN" ? setTechnicianNotes : setSltNotes;
+
   return (
     <div className="border-t border-slate-50">
       <button onClick={onToggle} className="flex w-full items-center gap-3 px-5 py-3 text-left">
         <ChevronDown size={14} className={clsx("shrink-0 text-slate-400 transition-transform", open && "rotate-180")} />
         <p className="min-w-0 flex-1 truncate text-sm text-slate-700">{item.title}</p>
+        <AudienceBadge audience={item.audience} />
         <ComplianceBadge status={item.assessment.status} />
       </button>
 
@@ -234,17 +262,6 @@ function ComplianceManageRow({
               {item.assessment.reviewedByName ? ` by ${item.assessment.reviewedByName}` : ""}
             </p>
           )}
-          {item.assessment.evidenceUrl && (
-            <a
-              href={item.assessment.evidenceUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs font-medium text-slate-900 hover:underline"
-            >
-              {item.assessment.evidenceUrl}
-              <ExternalLink size={11} />
-            </a>
-          )}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className={labelClass}>Status</label>
@@ -267,18 +284,14 @@ function ComplianceManageRow({
             </div>
           </div>
           <div>
-            <label className={labelClass}>Evidence / notes</label>
+            <label className={labelClass}>{notesLabel}</label>
             <textarea
               rows={2}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              value={notesValue}
+              onChange={(e) => setNotesValue(e.target.value)}
               className={inputClass}
-              placeholder="e.g. link to policy document, contract, or a description of current setup"
+              placeholder="e.g. current setup, what's been checked, what's outstanding"
             />
-          </div>
-          <div>
-            <label className={labelClass}>Evidence URL (optional)</label>
-            <input value={evidenceUrl} onChange={(e) => setEvidenceUrl(e.target.value)} placeholder="https://…" className={inputClass} />
           </div>
           <Button size="sm" onClick={save} disabled={saving}>
             {justSaved && <Check size={14} />}

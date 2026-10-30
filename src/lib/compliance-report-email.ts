@@ -1,5 +1,5 @@
 import type { ComplianceStatus, Priority } from "@prisma/client";
-import { escapeHtml, safeHref } from "@/lib/email-html";
+import { escapeHtml } from "@/lib/email-html";
 import { isCoreStandard } from "@/lib/dfe-standards";
 
 const STATUS_LABEL: Record<ComplianceStatus, string> = {
@@ -20,8 +20,8 @@ const STATUS_COLOR: Record<ComplianceStatus, { bg: string; fg: string; bar: stri
 
 type Assessment = {
   status: ComplianceStatus;
-  evidenceNotes: string | null;
-  evidenceUrl: string | null;
+  technicianNotes: string | null;
+  sltNotes: string | null;
   nextReviewDue: Date | null;
 };
 type Item = { id: string; title: string; priority: Priority };
@@ -75,8 +75,8 @@ export function buildComplianceReportEmail(params: {
     textLines.push("Needs attention:");
     for (const { standard, item, assessment } of flagged) {
       textLines.push(`  [${STATUS_LABEL[assessment!.status]}] ${item.title} (${standard.title})`);
-      if (assessment?.evidenceNotes) textLines.push(`    Notes: ${assessment.evidenceNotes}`);
-      if (assessment?.evidenceUrl) textLines.push(`    Evidence: ${assessment.evidenceUrl}`);
+      if (assessment?.technicianNotes) textLines.push(`    Technician notes: ${assessment.technicianNotes}`);
+      if (assessment?.sltNotes) textLines.push(`    SLT notes: ${assessment.sltNotes}`);
       if (assessment?.nextReviewDue) textLines.push(`    Review due: ${new Date(assessment.nextReviewDue).toLocaleDateString("en-GB")}`);
     }
   } else {
@@ -116,15 +116,14 @@ export function buildComplianceReportEmail(params: {
     ? flagged
         .map(({ standard, item, assessment }) => {
           const colors = STATUS_COLOR[assessment!.status];
-          const url = assessment?.evidenceUrl ? safeHref(assessment.evidenceUrl) : null;
           return `
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;border-left:3px solid ${colors.bar};background:#f8fafc;border-radius:6px;">
             <tr><td style="padding:12px 14px;">
               <span style="display:inline-block;padding:2px 8px;border-radius:99px;background:${colors.bg};color:${colors.fg};font-size:11px;font-weight:600;">${STATUS_LABEL[assessment!.status]}</span>
               <div style="margin-top:6px;font-size:13px;font-weight:600;color:#0f172a;">${escapeHtml(item.title)}</div>
               <div style="font-size:12px;color:#94a3b8;">${escapeHtml(standard.title)}</div>
-              ${assessment?.evidenceNotes ? `<div style="margin-top:6px;font-size:12px;color:#475569;">${escapeHtml(assessment.evidenceNotes)}</div>` : ""}
-              ${url ? `<div style="margin-top:4px;"><a href="${url}" style="font-size:12px;color:#0f172a;">${escapeHtml(assessment!.evidenceUrl!)}</a></div>` : ""}
+              ${assessment?.technicianNotes ? `<div style="margin-top:6px;font-size:12px;color:#475569;"><strong>Technician:</strong> ${escapeHtml(assessment.technicianNotes)}</div>` : ""}
+              ${assessment?.sltNotes ? `<div style="margin-top:6px;font-size:12px;color:#475569;"><strong>SLT:</strong> ${escapeHtml(assessment.sltNotes)}</div>` : ""}
               ${assessment?.nextReviewDue ? `<div style="margin-top:4px;font-size:11px;color:#94a3b8;">Review due ${new Date(assessment.nextReviewDue).toLocaleDateString("en-GB")}</div>` : ""}
             </td></tr>
           </table>`;

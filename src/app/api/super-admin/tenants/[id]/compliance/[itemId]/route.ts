@@ -7,8 +7,8 @@ type Params = { params: Promise<{ id: string; itemId: string }> };
 
 const bodySchema = z.object({
   status: z.enum(["NOT_STARTED", "IN_PROGRESS", "COMPLIANT", "NON_COMPLIANT", "NOT_APPLICABLE"]),
-  evidenceNotes: z.string().max(2000).optional(),
-  evidenceUrl: z.string().url().optional().or(z.literal("")),
+  technicianNotes: z.string().max(2000).optional(),
+  sltNotes: z.string().max(2000).optional(),
   nextReviewDue: z.string().optional(), // ISO date
   criteriaAnswers: z.record(z.string(), z.string()).optional(),
 });
@@ -45,8 +45,8 @@ export async function PUT(req: Request, { params }: Params) {
     if (!item) throw new AuthError("Compliance item not found", 404);
 
     const body = bodySchema.parse(await req.json());
-    const evidenceNotes = body.evidenceNotes || null;
-    const evidenceUrl = body.evidenceUrl || null;
+    const technicianNotes = body.technicianNotes || null;
+    const sltNotes = body.sltNotes || null;
     const nextReviewDue = body.nextReviewDue ? new Date(body.nextReviewDue) : null;
     const criteriaAnswers = sanitizeCriteriaAnswers(body.criteriaAnswers, item.criteria);
 
@@ -56,8 +56,8 @@ export async function PUT(req: Request, { params }: Params) {
         tenantId,
         itemId,
         status: body.status,
-        evidenceNotes,
-        evidenceUrl,
+        technicianNotes,
+        sltNotes,
         nextReviewDue,
         ...(criteriaAnswers && { criteriaAnswers }),
         reviewedById: session.user.id,
@@ -65,8 +65,8 @@ export async function PUT(req: Request, { params }: Params) {
       },
       update: {
         status: body.status,
-        evidenceNotes,
-        evidenceUrl,
+        technicianNotes,
+        sltNotes,
         nextReviewDue,
         ...(criteriaAnswers && { criteriaAnswers }),
         reviewedById: session.user.id,
@@ -77,8 +77,8 @@ export async function PUT(req: Request, { params }: Params) {
     const changed =
       !previous ||
       previous.status !== body.status ||
-      (previous.evidenceNotes ?? null) !== evidenceNotes ||
-      (previous.evidenceUrl ?? null) !== evidenceUrl ||
+      (previous.technicianNotes ?? null) !== technicianNotes ||
+      (previous.sltNotes ?? null) !== sltNotes ||
       (previous.nextReviewDue?.toISOString() ?? null) !== (nextReviewDue?.toISOString() ?? null) ||
       (criteriaAnswers && JSON.stringify(previous?.criteriaAnswers ?? {}) !== JSON.stringify(criteriaAnswers));
 
@@ -95,8 +95,8 @@ export async function PUT(req: Request, { params }: Params) {
             itemTitle: item.title,
             previousStatus: previous?.status ?? null,
             status: body.status,
-            evidenceNotes,
-            evidenceUrl,
+            technicianNotes,
+            sltNotes,
             nextReviewDue: nextReviewDue?.toISOString() ?? null,
             ...(criteriaAnswers && { criteriaAnswers }),
           },

@@ -7,8 +7,8 @@ import { SendReportDialog } from "@/components/send-report-dialog";
 type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
 type Assessment = {
   status: Status;
-  evidenceNotes: string | null;
-  evidenceUrl: string | null;
+  technicianNotes: string | null;
+  sltNotes: string | null;
   nextReviewDue: string | null;
   reviewedAt: string | null;
 };
@@ -18,9 +18,17 @@ type Item = {
   description: string;
   govLink: string | null;
   priority: "HIGH" | "MEDIUM" | "LOW";
+  audience: "TECHNICIAN" | "SLT" | "DSL";
   assessment: Assessment;
 };
-type Standard = { id: string; code: string; title: string; description: string; items: Item[] };
+type Standard = {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  evidence: { evidenceUrl: string | null };
+  items: Item[];
+};
 type Tenant = { name: string; logoUrl: string | null };
 
 export default function SuperAdminComplianceReportPage({ params }: PageProps<"/dashboard/super-admin/[id]/compliance/report">) {

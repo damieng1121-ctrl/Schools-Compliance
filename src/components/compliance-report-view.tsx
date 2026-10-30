@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Printer, ExternalLink } from "lucide-react";
+import { ArrowLeft, Printer, ExternalLink, FolderOpen } from "lucide-react";
 import { ComplianceBadge, CoreStandardBadge } from "@/components/badges";
 import { Button } from "@/components/ui/button";
 import { PlatformBadge } from "@/components/platform-badge";
 import { isCoreStandard } from "@/lib/dfe-standards";
+import { AudienceBadge, type Audience } from "@/components/audience-badge";
 
 type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
 type Assessment = {
   status: Status;
-  evidenceNotes: string | null;
-  evidenceUrl: string | null;
+  technicianNotes: string | null;
+  sltNotes: string | null;
   nextReviewDue: string | null;
   reviewedAt: string | null;
 };
@@ -21,9 +22,17 @@ type Item = {
   description: string;
   govLink: string | null;
   priority: "HIGH" | "MEDIUM" | "LOW";
+  audience: Audience;
   assessment: Assessment;
 };
-type Standard = { id: string; code: string; title: string; description: string; items: Item[] };
+type Standard = {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  evidence?: { evidenceUrl: string | null };
+  items: Item[];
+};
 type Tenant = { name: string; logoUrl: string | null };
 
 const PRIORITY_STYLES: Record<Item["priority"], string> = {
@@ -123,13 +132,26 @@ export function ComplianceReportView({
                   </p>
                 </div>
                 <p className="mt-0.5 text-xs text-slate-500">{standard.description}</p>
+                {standard.evidence?.evidenceUrl && (
+                  <a
+                    href={standard.evidence.evidenceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-slate-900 hover:underline"
+                  >
+                    <FolderOpen size={11} />
+                    Evidence for this standard
+                    <ExternalLink size={10} />
+                  </a>
+                )}
 
                 <div className="mt-3 divide-y divide-slate-100 rounded-xl border border-slate-200">
                   {standard.items.map((item) => (
                     <div key={item.id} className="break-inside-avoid p-3.5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <p className="text-sm font-medium text-slate-900">{item.title}</p>
+                          <AudienceBadge audience={item.audience} />
                           <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${PRIORITY_STYLES[item.priority]}`}>
                             {item.priority}
                           </span>
@@ -148,21 +170,17 @@ export function ComplianceReportView({
                           <ExternalLink size={9} />
                         </a>
                       )}
-                      {item.assessment.evidenceNotes && (
+                      {item.assessment.technicianNotes && (
                         <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600">
-                          {item.assessment.evidenceNotes}
+                          <span className="font-medium text-slate-500">Technician: </span>
+                          {item.assessment.technicianNotes}
                         </p>
                       )}
-                      {item.assessment.evidenceUrl && (
-                        <a
-                          href={item.assessment.evidenceUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-slate-900 hover:underline"
-                        >
-                          {item.assessment.evidenceUrl}
-                          <ExternalLink size={10} />
-                        </a>
+                      {item.assessment.sltNotes && (
+                        <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600">
+                          <span className="font-medium text-slate-500">SLT: </span>
+                          {item.assessment.sltNotes}
+                        </p>
                       )}
                       {(item.assessment.nextReviewDue || item.assessment.reviewedAt) && (
                         <div className="mt-1 flex flex-wrap gap-x-4 text-[11px] text-slate-400">

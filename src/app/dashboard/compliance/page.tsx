@@ -12,13 +12,16 @@ import { DfeSourceText } from "@/components/dfe-source-text";
 import { ComplianceLogs } from "@/components/compliance-logs";
 import { SendReportDialog } from "@/components/send-report-dialog";
 import { CriteriaTrafficLight, type Criterion } from "@/components/criteria-traffic-light";
+import { AudienceBadge, type Audience } from "@/components/audience-badge";
+import { AudienceFilter, type AudienceOrAll } from "@/components/audience-filter";
+import { StandardEvidenceArea } from "@/components/standard-evidence-area";
 import { registerFlush, unregisterFlush } from "@/lib/idle-logout";
 import clsx from "clsx";
 
 type Assessment = {
   status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLIANT" | "NON_COMPLIANT" | "NOT_APPLICABLE";
-  evidenceNotes: string | null;
-  evidenceUrl: string | null;
+  technicianNotes: string | null;
+  sltNotes: string | null;
   nextReviewDue: string | null;
   criteriaAnswers: Record<string, string> | null;
 };
@@ -31,6 +34,7 @@ type Item = {
   guidance: string | null;
   priority: "HIGH" | "MEDIUM" | "LOW";
   govLink: string | null;
+  audience: Audience;
   criteria: Criterion[] | null;
   assessment: Assessment;
 };
@@ -40,12 +44,22 @@ const PRIORITY_STYLES: Record<Item["priority"], string> = {
   MEDIUM: "bg-amber-50 text-amber-600",
   LOW: "bg-slate-100 text-slate-500",
 };
-type Standard = { id: string; code: string; title: string; description: string; officialUrl: string | null; items: Item[] };
+type StandardEvidence = { evidenceUrl: string | null; updatedAt: string | null };
+type Standard = {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  officialUrl: string | null;
+  evidence: StandardEvidence;
+  items: Item[];
+};
 
 export default function CompliancePage() {
   const [standards, setStandards] = useState<Standard[] | null>(null);
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("");
+  const [audienceFilter, setAudienceFilter] = useState<AudienceOrAll>("ALL");
 
   function load() {
     fetch("/api/compliance")
@@ -63,6 +77,9 @@ export default function CompliancePage() {
   const allItems = standards.flatMap((s) => s.items);
   const compliant = allItems.filter((i) => i.assessment.status === "COMPLIANT").length;
   const overallPct = allItems.length ? Math.round((compliant / allItems.length) * 100) : 0;
+
+  const visibleItems = (standard: Standard) =>
+    audienceFilter === "ALL" ? standard.items : standard.items.filter((i) => i.audience === audienceFilter);
 
   return (
     <div>
@@ -116,15 +133,21 @@ export default function CompliancePage() {
         </p>
       </Card>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs font-medium text-slate-500">Show items for</p>
+        <AudienceFilter value={audienceFilter} onChange={setAudienceFilter} />
+      </div>
+
+      <div className="mt-3">
         <Tabs
           tabs={[
             ...standards.map((standard) => {
-              const standardCompliant = standard.items.filter((i) => i.assessment.status === "COMPLIANT").length;
+              const items = visibleItems(standard);
+              const standardCompliant = items.filter((i) => i.assessment.status === "COMPLIANT").length;
               return {
                 id: standard.id,
                 label: standard.title,
-                meta: `${standardCompliant}/${standard.items.length}`,
+                meta: `${standardCompliant}/${items.length}`,
                 flagged: isCoreStandard(standard.code),
               };
             }),
@@ -163,8 +186,9 @@ export default function CompliancePage() {
                     </a>
                   )}
                 </div>
+                <StandardEvidenceArea endpoint={`/api/compliance/evidence/${standard.id}`} evidence={standard.evidence} />
                 <div className="divide-y divide-slate-100">
-                  {standard.items.map((item) => (
+                  {visibleItems(standard).map((item) => (
                     <ComplianceItemRow
                       key={item.id}
                       item={item}
@@ -173,6 +197,9 @@ export default function CompliancePage() {
                       onSaved={load}
                     />
                   ))}
+                  {visibleItems(standard).length === 0 && (
+                    <p className="px-5 py-6 text-sm text-slate-500">No items for this role under this standard.</p>
+                  )}
                 </div>
               </Card>
             ))
@@ -194,8 +221,8 @@ function ComplianceItemRow({
   onSaved: () => void;
 }) {
   const [status, setStatus] = useState(item.assessment.status);
-  const [notes, setNotes] = useState(item.assessment.evidenceNotes ?? "");
-  const [evidenceUrl, setEvidenceUrl] = useState(item.assessment.evidenceUrl ?? "");
+  const [technicianNotes, setTechnicianNotes] = useState(item.assessment.technicianNotes ?? "");
+  const [sltNotes, setSltNotes] = useState(item.assessment.sltNotes ?? "");
   const [nextReviewDue, setNextReviewDue] = useState(item.assessment.nextReviewDue?.slice(0, 10) ?? "");
   const [criteriaAnswers, setCriteriaAnswers] = useState(item.assessment.criteriaAnswers ?? {});
   const [saving, setSaving] = useState(false);
@@ -209,8 +236,8 @@ function ComplianceItemRow({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           status,
-          evidenceNotes: notes,
-          evidenceUrl,
+          technicianNotes,
+          sltNotes,
           nextReviewDue: nextReviewDue || undefined,
           criteriaAnswers,
         }),
@@ -229,13 +256,17 @@ function ComplianceItemRow({
     const key = `dashboard-compliance-item-${item.id}`;
     const dirty =
       status !== item.assessment.status ||
-      notes !== (item.assessment.evidenceNotes ?? "") ||
-      evidenceUrl !== (item.assessment.evidenceUrl ?? "") ||
+      technicianNotes !== (item.assessment.technicianNotes ?? "") ||
+      sltNotes !== (item.assessment.sltNotes ?? "") ||
       nextReviewDue !== (item.assessment.nextReviewDue?.slice(0, 10) ?? "") ||
       JSON.stringify(criteriaAnswers) !== JSON.stringify(item.assessment.criteriaAnswers ?? {});
     registerFlush(key, () => (dirty ? save() : undefined));
     return () => unregisterFlush(key);
   });
+
+  const notesLabel = item.audience === "TECHNICIAN" ? "Technician notes" : "SLT notes";
+  const notesValue = item.audience === "TECHNICIAN" ? technicianNotes : sltNotes;
+  const setNotesValue = item.audience === "TECHNICIAN" ? setTechnicianNotes : setSltNotes;
 
   return (
     <div className="transition-colors hover:bg-slate-50/60">
@@ -247,6 +278,7 @@ function ComplianceItemRow({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="font-medium text-slate-900">{item.title}</p>
+            <AudienceBadge audience={item.audience} />
             <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${PRIORITY_STYLES[item.priority]}`}>
               {item.priority}
             </span>
@@ -324,28 +356,14 @@ function ComplianceItemRow({
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-600">Evidence / notes</label>
+            <label className="block text-xs font-medium text-slate-600">{notesLabel}</label>
             <textarea
               rows={2}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              value={notesValue}
+              onChange={(e) => setNotesValue(e.target.value)}
               className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
-              placeholder="e.g. link to policy document, contract, or a description of current setup"
+              placeholder="e.g. current setup, what's been checked, what's outstanding"
             />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-600">Evidence URL (optional)</label>
-            <input
-              value={evidenceUrl}
-              onChange={(e) => setEvidenceUrl(e.target.value)}
-              placeholder="https://…"
-              className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
-            />
-            <p className="mt-1 text-xs text-slate-400">
-              A link to a document, photo, or network diagram — Google Drive works well. Make sure it&apos;s
-              shared with &ldquo;Anyone with the link&rdquo; (or your reviewers directly), not restricted to
-              your school&apos;s internal Drive users, or others won&apos;t be able to open it.
-            </p>
           </div>
           <Button size="sm" onClick={save} disabled={saving}>
             {justSaved && <Check size={14} />}

@@ -12,6 +12,9 @@ type LogMetadata = {
   itemTitle?: string;
   previousStatus?: Status | null;
   status?: Status;
+  technicianNotes?: string | null;
+  sltNotes?: string | null;
+  /** Legacy — present on log entries from before notes were split by role. */
   evidenceNotes?: string | null;
   evidenceUrl?: string | null;
   nextReviewDue?: string | null;
@@ -38,7 +41,7 @@ function csvCell(value: string): string {
 }
 
 function toCsv(logs: LogEntry[]): string {
-  const header = ["Date", "User", "Standard", "Item", "Previous status", "New status", "Notes", "Evidence URL", "Next review due"];
+  const header = ["Date", "User", "Standard", "Item", "Previous status", "New status", "Technician notes", "SLT notes", "Next review due"];
   const rows = logs.map((log) => {
     const m = log.metadata ?? {};
     return [
@@ -48,8 +51,8 @@ function toCsv(logs: LogEntry[]): string {
       m.itemTitle ?? "",
       m.previousStatus ? STATUS_LABELS[m.previousStatus] : "",
       m.status ? STATUS_LABELS[m.status] : "",
-      m.evidenceNotes ?? "",
-      m.evidenceUrl ?? "",
+      m.technicianNotes ?? "",
+      m.sltNotes ?? m.evidenceNotes ?? "",
       m.nextReviewDue ? new Date(m.nextReviewDue).toLocaleDateString("en-GB") : "",
     ]
       .map(csvCell)
@@ -141,11 +144,21 @@ export function ComplianceLogs({ endpoint }: { endpoint: string }) {
                     </span>
                   )}
                 </div>
-                {m.evidenceNotes && <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600">{m.evidenceNotes}</p>}
-                {(m.evidenceUrl || m.nextReviewDue) && (
+                {m.technicianNotes && (
+                  <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600">
+                    <span className="font-medium text-slate-500">Technician: </span>
+                    {m.technicianNotes}
+                  </p>
+                )}
+                {(m.sltNotes || m.evidenceNotes) && (
+                  <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600">
+                    <span className="font-medium text-slate-500">SLT: </span>
+                    {m.sltNotes ?? m.evidenceNotes}
+                  </p>
+                )}
+                {m.nextReviewDue && (
                   <div className="mt-1 flex flex-wrap gap-x-4 text-[11px] text-slate-400">
-                    {m.evidenceUrl && <span>Evidence: {m.evidenceUrl}</span>}
-                    {m.nextReviewDue && <span>Next review due {new Date(m.nextReviewDue).toLocaleDateString("en-GB")}</span>}
+                    <span>Next review due {new Date(m.nextReviewDue).toLocaleDateString("en-GB")}</span>
                   </div>
                 )}
               </div>

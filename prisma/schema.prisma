@@ -37,10 +37,11 @@ model Tenant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users           User[]
-  assessments     ComplianceAssessment[]
-  filteringChecks FilteringCheck[]
-  auditLogs       AuditLog[]
+  users            User[]
+  assessments      ComplianceAssessment[]
+  standardEvidence StandardEvidence[]
+  filteringChecks  FilteringCheck[]
+  auditLogs        AuditLog[]
 }
 
 enum Role {
@@ -73,6 +74,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   assessmentsReviewed      ComplianceAssessment[]
+  standardEvidenceUpdates  StandardEvidence[]
   filteringChecksPerformed FilteringCheck[]
   auditLogs                AuditLog[]
 
@@ -97,13 +99,44 @@ model ComplianceStandard {
   officialUrl String?
   order       Int     @default(0)
 
-  items ComplianceItem[]
+  items    ComplianceItem[]
+  evidence StandardEvidence[]
+}
+
+/// One evidence link per school per standard (e.g. a Google Drive folder) —
+/// replaces having a separate Evidence URL on every item within the
+/// standard, which was needless repetition for evidence that usually covers
+/// the whole technical area at once.
+model StandardEvidence {
+  id         String             @id @default(cuid())
+  tenantId   String
+  tenant     Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  standardId String
+  standard   ComplianceStandard @relation(fields: [standardId], references: [id], onDelete: Cascade)
+
+  evidenceUrl String?
+
+  updatedById String?
+  updatedBy   User?    @relation(fields: [updatedById], references: [id])
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, standardId])
 }
 
 enum Priority {
   HIGH
   MEDIUM
   LOW
+}
+
+/// Who's actually responsible for answering an item — lets the checklist be
+/// filtered by role. Each item has exactly one; some items genuinely involve
+/// more than one person, but this names whoever has first-hand knowledge to
+/// answer it.
+enum Audience {
+  TECHNICIAN
+  SLT
+  DSL
 }
 
 model ComplianceItem {
@@ -129,6 +162,8 @@ model ComplianceItem {
   priority    Priority           @default(MEDIUM)
   /// Deep link to the specific DfE guidance sub-page for this item, if more specific than the standard's officialUrl
   govLink     String?
+  /// Who's responsible for answering this item — lets the checklist be filtered by role.
+  audience    Audience           @default(TECHNICIAN)
   /// Optional traffic-light technical criteria for items where the DfE
   /// standard itself describes a tiered minimum (e.g. wireless generation,
   /// switch interconnect speed) — JSON array of
@@ -157,8 +192,16 @@ model ComplianceAssessment {
   item     ComplianceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   status        ComplianceStatus @default(NOT_STARTED)
+  /// Superseded by technicianNotes/sltNotes below — kept, unedited from the
+  /// UI going forward, so pre-existing notes aren't lost.
   evidenceNotes String?          @db.Text
+  /// Superseded by the per-standard StandardEvidence area — kept, unedited
+  /// from the UI going forward, so pre-existing links aren't lost.
   evidenceUrl   String?
+  /// Notes field shown when this item's audience is TECHNICIAN.
+  technicianNotes String?        @db.Text
+  /// Notes field shown when this item's audience is SLT.
+  sltNotes        String?        @db.Text
   /// This tenant's answer to each of the item's `criteria`, if any —
   /// `{ [criterionId]: levelValue }`.
   criteriaAnswers Json?
