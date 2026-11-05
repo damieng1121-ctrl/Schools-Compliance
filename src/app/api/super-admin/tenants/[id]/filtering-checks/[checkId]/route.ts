@@ -44,3 +44,29 @@ export async function GET(_req: Request, { params }: Params) {
     };
   });
 }
+
+/** Permanently deletes a logged Filtering & Monitoring check visit — SUPER_ADMIN only. */
+export async function DELETE(_req: Request, { params }: Params) {
+  return withApiErrors(async () => {
+    const session = await requireRole(["SUPER_ADMIN"]);
+    const { id: tenantId, checkId } = await params;
+
+    const check = await prisma.filteringCheck.findUnique({ where: { id: checkId } });
+    if (!check || check.tenantId !== tenantId) throw new AuthError("Filtering check not found", 404);
+
+    await prisma.filteringCheck.delete({ where: { id: checkId } });
+
+    await prisma.auditLog.create({
+      data: {
+        tenantId,
+        userId: session.user.id,
+        action: "filtering_check.deleted",
+        entityType: "FilteringCheck",
+        entityId: checkId,
+        metadata: { performedAt: check.performedAt.toISOString() },
+      },
+    });
+
+    return { deleted: true };
+  });
+}

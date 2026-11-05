@@ -7,13 +7,25 @@ import { ArrowLeft, PlusCircle, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { inputClass, labelClass } from "@/components/ui/input";
+import { USER_TYPE_LABEL, DEVICE_TYPE_LABEL } from "@/lib/filtering-check-device";
 
 type CatalogueItem = { id: string; title: string; guidance: string | null };
 type Outcome = "PASS" | "FAIL" | "NOT_APPLICABLE" | "NOT_TESTED";
-type DeviceDraft = { label: string; results: Record<string, { outcome: Outcome; actionNotes: string }> };
+type UserType = keyof typeof USER_TYPE_LABEL;
+type DeviceType = keyof typeof DEVICE_TYPE_LABEL;
+type DeviceDraft = {
+  userType: UserType | "";
+  deviceType: DeviceType | "";
+  location: string;
+  results: Record<string, { outcome: Outcome; actionNotes: string }>;
+};
 
 function blankResults(catalogue: CatalogueItem[]): DeviceDraft["results"] {
   return Object.fromEntries(catalogue.map((item) => [item.id, { outcome: "NOT_TESTED" as Outcome, actionNotes: "" }]));
+}
+
+function blankDevice(catalogue: CatalogueItem[]): DeviceDraft {
+  return { userType: "", deviceType: "", location: "", results: blankResults(catalogue) };
 }
 
 export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
@@ -34,13 +46,13 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
       setCatalogue(items);
       setSchoolName(tenant.name);
       setHasDslEmail(!!tenant.dslEmail);
-      setDevices([{ label: "", results: blankResults(items) }]);
+      setDevices([blankDevice(items)]);
     });
   }, [tenantId]);
 
   function addDevice() {
     if (!catalogue) return;
-    setDevices((prev) => [...prev, { label: "", results: blankResults(catalogue) }]);
+    setDevices((prev) => [...prev, blankDevice(catalogue)]);
   }
 
   function removeDevice(index: number) {
@@ -69,7 +81,9 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
         body: JSON.stringify({
           notes: notes || undefined,
           devices: devices.map((d) => ({
-            label: d.label,
+            userType: d.userType || undefined,
+            deviceType: d.deviceType || undefined,
+            location: d.location || undefined,
             results: Object.entries(d.results).map(([itemId, r]) => ({
               itemId,
               outcome: r.outcome,
@@ -92,7 +106,8 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
 
   if (!catalogue) return <p className="text-sm text-slate-500">Loading…</p>;
 
-  const canSubmit = devices.length > 0 && devices.every((d) => d.label.trim().length > 0);
+  const canSubmit =
+    devices.length > 0 && devices.every((d) => d.userType || d.deviceType || d.location.trim().length > 0);
 
   return (
     <div>
@@ -123,16 +138,47 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
       <div className="mt-6 space-y-6">
         {devices.map((device, deviceIndex) => (
           <Card key={deviceIndex} className="overflow-hidden">
-            <div className="flex items-center gap-3 border-b border-slate-100 p-5">
-              <div className="flex-1">
-                <label className={labelClass}>What was tested</label>
-                <input
-                  required
-                  value={device.label}
-                  onChange={(e) => updateDevice(deviceIndex, { label: e.target.value })}
-                  placeholder="e.g. Staff laptop — reception, Student login — Y7, Guest network"
-                  className={inputClass}
-                />
+            <div className="flex items-start gap-3 border-b border-slate-100 p-5">
+              <div className="grid flex-1 gap-3 sm:grid-cols-3">
+                <div>
+                  <label className={labelClass}>User tested</label>
+                  <select
+                    value={device.userType}
+                    onChange={(e) => updateDevice(deviceIndex, { userType: e.target.value as UserType | "" })}
+                    className={inputClass}
+                  >
+                    <option value="">Not specified</option>
+                    {Object.entries(USER_TYPE_LABEL).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>Device tested</label>
+                  <select
+                    value={device.deviceType}
+                    onChange={(e) => updateDevice(deviceIndex, { deviceType: e.target.value as DeviceType | "" })}
+                    className={inputClass}
+                  >
+                    <option value="">Not specified</option>
+                    {Object.entries(DEVICE_TYPE_LABEL).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>Location / context</label>
+                  <input
+                    value={device.location}
+                    onChange={(e) => updateDevice(deviceIndex, { location: e.target.value })}
+                    placeholder="e.g. Reception, Y7 classroom, Portacabin 2, BYOD"
+                    className={inputClass}
+                  />
+                </div>
               </div>
               {devices.length > 1 && (
                 <button

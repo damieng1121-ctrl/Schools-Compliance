@@ -3,6 +3,7 @@ import { requireRole, AuthError } from "@/lib/session";
 import { withApiErrors } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { sendFilteringCheckToDsl } from "@/lib/filtering-check-send";
+import { composeDeviceLabel } from "@/lib/filtering-check-device";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -38,10 +39,18 @@ const resultSchema = z.object({
   outcome: z.enum(["PASS", "FAIL", "NOT_APPLICABLE", "NOT_TESTED"]),
   actionNotes: z.string().max(2000).optional(),
 });
-const deviceSchema = z.object({
-  label: z.string().trim().min(1).max(200),
-  results: z.array(resultSchema).min(1),
-});
+const deviceSchema = z
+  .object({
+    userType: z.enum(["STAFF", "STUDENT", "GUEST", "VISITOR", "OTHER"]).optional(),
+    deviceType: z
+      .enum(["LAPTOP", "DESKTOP", "CHROMEBOOK", "TABLET", "PHONE", "INTERACTIVE_WHITEBOARD", "NETWORK", "OTHER"])
+      .optional(),
+    location: z.string().trim().max(200).optional(),
+    results: z.array(resultSchema).min(1),
+  })
+  .refine((d) => d.userType || d.deviceType || d.location, {
+    message: "Pick a user type, device type, or add a location/context",
+  });
 const bodySchema = z.object({
   notes: z.string().max(2000).optional(),
   devices: z.array(deviceSchema).min(1),
@@ -70,7 +79,10 @@ export async function POST(req: Request, { params }: Params) {
         notes: body.notes || null,
         devices: {
           create: body.devices.map((d, order) => ({
-            label: d.label,
+            label: composeDeviceLabel(d),
+            userType: d.userType,
+            deviceType: d.deviceType,
+            location: d.location || null,
             order,
             results: {
               create: d.results.map((r) => ({

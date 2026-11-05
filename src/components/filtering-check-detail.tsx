@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Mail, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -45,9 +46,12 @@ export function FilteringCheckDetailView({
   backLabel?: string;
   readOnly?: boolean;
 }) {
+  const router = useRouter();
   const [check, setCheck] = useState<CheckDetail | null>(null);
   const [hasDslEmail, setHasDslEmail] = useState(false);
   const [sending, setSending] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   function load() {
@@ -76,6 +80,22 @@ export function FilteringCheckDetailView({
       load();
     } finally {
       setSending(false);
+    }
+  }
+
+  async function deleteCheck() {
+    setDeleting(true);
+    setError(null);
+    try {
+      const res = await fetch(`${apiBase}/filtering-checks/${checkId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const body = await res.json();
+        setError(body.error ?? "Something went wrong.");
+        return;
+      }
+      router.push(backHref);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -151,6 +171,32 @@ export function FilteringCheckDetailView({
         </div>
         {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       </Card>
+
+      {!readOnly && (
+        <Card className="mt-6 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-slate-900">Delete this check</p>
+              <p className="mt-0.5 text-xs text-slate-500">Permanently removes this visit and everything logged against it.</p>
+            </div>
+            {confirmDelete ? (
+              <div className="flex items-center gap-2">
+                <Button variant="danger" onClick={deleteCheck} disabled={deleting}>
+                  {deleting ? "Deleting…" : "Confirm delete"}
+                </Button>
+                <Button variant="ghost" onClick={() => setConfirmDelete(false)}>
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+                <Trash2 size={15} />
+                Delete check
+              </Button>
+            )}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

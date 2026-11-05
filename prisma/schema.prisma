@@ -268,12 +268,35 @@ enum CheckOutcome {
   NOT_TESTED
 }
 
+enum CheckUserType {
+  STAFF
+  STUDENT
+  GUEST
+  VISITOR
+  OTHER
+}
+
+enum CheckDeviceType {
+  LAPTOP
+  DESKTOP
+  CHROMEBOOK
+  TABLET
+  PHONE
+  INTERACTIVE_WHITEBOARD
+  NETWORK
+  OTHER
+}
+
 model FilteringCheckDevice {
   id               String         @id @default(cuid())
   filteringCheckId String
   filteringCheck   FilteringCheck @relation(fields: [filteringCheckId], references: [id], onDelete: Cascade)
-  /// What was tested, e.g. "Staff laptop — reception", "Student login — Y7", "Guest network"
+  /// Display label — computed server-side from userType/deviceType/location on new checks (e.g. "Staff — Laptop — Reception"); free text on checks logged before this field existed.
   label            String
+  userType         CheckUserType?
+  deviceType       CheckDeviceType?
+  /// Free-text context, e.g. "Reception", "Y7 classroom", "Portacabin 2", "BYOD", "Home/remote"
+  location         String?
   order            Int            @default(0)
 
   results FilteringCheckResult[]
