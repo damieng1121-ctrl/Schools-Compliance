@@ -29,14 +29,14 @@ export function DfeSourceText({ text }: { text: string }) {
   });
 
   return (
-    <div className="divide-y divide-slate-100">
+    <div className="divide-y divide-slate-100 dark:divide-slate-800">
       {sections.map((section, i) => {
         const Icon = iconFor(section.heading);
         return (
           <div key={i} className={i === 0 ? "pb-4" : "py-4"}>
             <div className="flex items-center gap-1.5">
-              <Icon size={13} className="shrink-0 text-slate-400" />
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{section.heading}</p>
+              <Icon size={13} className="shrink-0 text-slate-400 dark:text-slate-500" />
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{section.heading}</p>
             </div>
             <div className="mt-2 space-y-2.5">
               {section.body.split("\n\n").map((block, j) => (
@@ -54,7 +54,7 @@ function SourceBlock({ block }: { block: string }) {
   const lines = block.split("\n");
   if (lines.every((l) => l.startsWith("- ") || l.trim() === "")) {
     return (
-      <ul className="list-disc space-y-1 pl-4 text-sm leading-relaxed text-slate-700">
+      <ul className="list-disc space-y-1 pl-4 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
         {lines
           .filter((l) => l.trim() !== "")
           .map((l, i) => (
@@ -65,10 +65,10 @@ function SourceBlock({ block }: { block: string }) {
   }
   if (/^(Note|Dependencies):/i.test(block.trim())) {
     return (
-      <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-relaxed text-amber-900">
+      <p className="rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 text-sm leading-relaxed text-amber-900 dark:text-amber-200">
         {block}
       </p>
     );
   }
-  return <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700">{block}</p>;
+  return <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700 dark:text-slate-300">{block}</p>;
 }

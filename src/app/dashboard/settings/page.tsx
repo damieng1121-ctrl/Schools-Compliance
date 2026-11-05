@@ -46,15 +46,15 @@ export default function SettingsPage() {
     }
   }
 
-  if (loading) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (loading) return <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p>;
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900">School settings</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">School settings</h1>
       <Card className="mt-6 max-w-md p-5">
         <div className="flex items-center gap-2">
-          <Building2 size={16} className="text-slate-400" />
-          <h2 className="font-semibold text-slate-900">Branding</h2>
+          <Building2 size={16} className="text-slate-400 dark:text-slate-500" />
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Branding</h2>
         </div>
         <form onSubmit={onSubmit} className="mt-3 space-y-4">
           <div>
@@ -69,18 +69,18 @@ export default function SettingsPage() {
               placeholder="https://…"
               className={inputClass}
             />
-            <p className="mt-1.5 text-xs text-slate-500">
+            <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
               A link to your school&apos;s logo image, hosted anywhere reachable over HTTPS. Shown in
               place of the default badge in your dashboard&apos;s sidebar.
             </p>
             {logoUrl && (
               // eslint-disable-next-line @next/next/no-img-element -- external, unpredictable source; next/image's domain allowlist doesn't fit here
-              <img src={logoUrl} alt="Logo preview" className="mt-2 h-10 w-10 rounded-lg border border-slate-100 object-contain" />
+              <img src={logoUrl} alt="Logo preview" className="mt-2 h-10 w-10 rounded-lg border border-slate-100 dark:border-slate-800 object-contain" />
             )}
           </div>
           {message && (
             <p
-              className={`rounded-lg px-3 py-2 text-sm ${message.type === "ok" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}
+              className={`rounded-lg px-3 py-2 text-sm ${message.type === "ok" ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300"}`}
             >
               {message.text}
             </p>

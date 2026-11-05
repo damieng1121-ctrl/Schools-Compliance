@@ -104,7 +104,7 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
     }
   }
 
-  if (!catalogue) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!catalogue) return <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p>;
 
   const canSubmit =
     devices.length > 0 && devices.every((d) => d.userType || d.deviceType || d.location.trim().length > 0);
@@ -113,13 +113,13 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
     <div>
       <Link
         href={`/dashboard/super-admin/${tenantId}`}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
       >
         <ArrowLeft size={14} />
         {schoolName || "Back"}
       </Link>
-      <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">Log a Filtering &amp; Monitoring check</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Log a Filtering &amp; Monitoring check</h1>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
         Add every device, account, or location tested — remember portacabins, trolleys, home devices, guest networks,
         BYOD, and the most recent new or rebuilt device.
       </p>
@@ -138,7 +138,7 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
       <div className="mt-6 space-y-6">
         {devices.map((device, deviceIndex) => (
           <Card key={deviceIndex} className="overflow-hidden">
-            <div className="flex items-start gap-3 border-b border-slate-100 p-5">
+            <div className="flex items-start gap-3 border-b border-slate-100 dark:border-slate-800 p-5">
               <div className="grid flex-1 gap-3 sm:grid-cols-3">
                 <div>
                   <label className={labelClass}>User tested</label>
@@ -184,32 +184,32 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
                 <button
                   type="button"
                   onClick={() => removeDevice(deviceIndex)}
-                  className="mt-5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600"
+                  className="mt-5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
                   aria-label="Remove this device"
                 >
                   <Trash2 size={15} />
                 </button>
               )}
             </div>
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {catalogue.map((item) => {
                 const result = device.results[item.id];
                 return (
                   <div key={item.id} className="flex items-start gap-3 px-5 py-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-900">{item.title}</p>
-                      {item.guidance && <p className="mt-0.5 text-xs text-slate-500">{item.guidance}</p>}
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
+                      {item.guidance && <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{item.guidance}</p>}
                       <input
                         value={result.actionNotes}
                         onChange={(e) => updateResult(deviceIndex, item.id, { actionNotes: e.target.value })}
                         placeholder="Notes or action taken (optional)"
-                        className="mt-2 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                        className="mt-2 w-full rounded-lg border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 text-xs focus:border-slate-400 dark:focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100 dark:focus:ring-slate-800"
                       />
                     </div>
                     <select
                       value={result.outcome}
                       onChange={(e) => updateResult(deviceIndex, item.id, { outcome: e.target.value as Outcome })}
-                      className="mt-0.5 shrink-0 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                      className="mt-0.5 shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 text-xs font-medium focus:border-slate-400 dark:focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100 dark:focus:ring-slate-800"
                     >
                       <option value="NOT_TESTED">Not tested</option>
                       <option value="PASS">Pass</option>
@@ -229,7 +229,7 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
         Add another device tested
       </Button>
 
-      {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mt-4 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{error}</p>}
 
       <div className="mt-6 flex items-center gap-3">
         <Button type="button" variant="secondary" onClick={() => submit(false)} disabled={!canSubmit || saving !== null}>
@@ -238,7 +238,7 @@ export function FilteringCheckForm({ tenantId }: { tenantId: string }) {
         <Button type="button" onClick={() => submit(true)} disabled={!canSubmit || !hasDslEmail || saving !== null}>
           {saving === "send" ? "Saving…" : "Save & email DSL"}
         </Button>
-        {!hasDslEmail && <p className="text-xs text-slate-500">Add a DSL email on this school to enable sending.</p>}
+        {!hasDslEmail && <p className="text-xs text-slate-500 dark:text-slate-400">Add a DSL email on this school to enable sending.</p>}
       </div>
     </div>
   );

@@ -188,37 +188,37 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
     }
   }
 
-  if (notFound) return <p className="text-sm text-slate-500">School not found.</p>;
-  if (!school) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (notFound) return <p className="text-sm text-slate-500 dark:text-slate-400">School not found.</p>;
+  if (!school) return <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p>;
 
   const pct = school.totalItems ? Math.round((school.compliantCount / school.totalItems) * 100) : 0;
 
   return (
     <div>
-      <Link href="/dashboard/super-admin" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900">
+      <Link href="/dashboard/super-admin" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
         <ArrowLeft size={14} />
         All schools
       </Link>
       <div className="mt-3 flex items-center gap-3">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{school.name}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{school.name}</h1>
         <span
           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
-            school.isActive ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+            school.isActive ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300"
           }`}
         >
           <span className={`h-1.5 w-1.5 rounded-full ${school.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
           {school.isActive ? "Active" : "Suspended"}
         </span>
       </div>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
         {school.slug} · {school.compliantCount}/{school.totalItems} standards met ({pct}%)
       </p>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="p-5">
           <div className="flex items-center gap-2">
-            <Building2 size={16} className="text-slate-400" />
-            <h2 className="font-semibold text-slate-900">School details</h2>
+            <Building2 size={16} className="text-slate-400 dark:text-slate-500" />
+            <h2 className="font-semibold text-slate-900 dark:text-slate-100">School details</h2>
           </div>
           <form onSubmit={saveDetails} className="mt-3 space-y-3">
             <div>
@@ -238,9 +238,9 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
                 className={inputClass}
               />
             </div>
-            <div className="border-t border-slate-100 pt-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Designated Safeguarding Lead</p>
-              <p className="mt-1 text-xs text-slate-500">Filtering &amp; Monitoring check reports get emailed here.</p>
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Designated Safeguarding Lead</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Filtering &amp; Monitoring check reports get emailed here.</p>
             </div>
             <div>
               <label className={labelClass}>DSL name (optional)</label>
@@ -259,7 +259,7 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
             {detailsMessage && (
               <p
                 className={`rounded-lg px-3 py-2 text-sm ${
-                  detailsMessage.type === "ok" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+                  detailsMessage.type === "ok" ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300"
                 }`}
               >
                 {detailsMessage.text}
@@ -278,8 +278,8 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
 
         <Card className="p-5">
           <div className="flex items-center gap-2">
-            <UserPlus size={16} className="text-slate-400" />
-            <h2 className="font-semibold text-slate-900">Add a user to this school</h2>
+            <UserPlus size={16} className="text-slate-400 dark:text-slate-500" />
+            <h2 className="font-semibold text-slate-900 dark:text-slate-100">Add a user to this school</h2>
           </div>
           <form onSubmit={addUser} className="mt-3 space-y-3">
             <div>
@@ -307,31 +307,31 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
                 <option value="ADMIN">Admin</option>
               </select>
             </div>
-            {addUserError && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{addUserError}</p>}
+            {addUserError && <p className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{addUserError}</p>}
             <Button type="submit" disabled={addingUser}>
               {addingUser ? "Adding…" : "Add user"}
             </Button>
-            <p className="text-xs text-slate-500">They&apos;ll get an email with a temporary password.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">They&apos;ll get an email with a temporary password.</p>
           </form>
         </Card>
       </div>
 
       <Card className="mt-6">
-        <div className="border-b border-slate-100 px-5 py-3">
-          <h2 className="font-semibold text-slate-900">Users ({school.users.length})</h2>
+        <div className="border-b border-slate-100 dark:border-slate-800 px-5 py-3">
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Users ({school.users.length})</h2>
         </div>
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-slate-100 dark:divide-slate-800">
           {school.users.map((u) => (
             <div key={u.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
               <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto sm:flex-1">
                 <Avatar name={u.name ?? u.email} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-slate-900">{u.name ?? u.email}</p>
-                  <p className="truncate text-xs text-slate-500">{u.email}</p>
+                  <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">{u.name ?? u.email}</p>
+                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">{u.email}</p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:ml-auto sm:shrink-0">
-                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+                <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300">
                   {u.role}
                 </span>
                 {u.twoFactorEnabled ? (
@@ -345,7 +345,7 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
                     {resetting2faId === u.id ? "Resetting…" : "Reset 2FA"}
                   </Button>
                 ) : (
-                  <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                  <span className="rounded-full bg-amber-50 dark:bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
                     2FA not set up
                   </span>
                 )}
@@ -368,7 +368,7 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
                     type="button"
                     onClick={() => setConfirmRemoveId(u.id)}
                     title="Remove from school"
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <X size={15} />
                   </button>
@@ -376,7 +376,7 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
               </div>
             </div>
           ))}
-          {school.users.length === 0 && <p className="px-5 py-4 text-sm text-slate-500">No users yet.</p>}
+          {school.users.length === 0 && <p className="px-5 py-4 text-sm text-slate-500 dark:text-slate-400">No users yet.</p>}
         </div>
       </Card>
 
@@ -392,14 +392,14 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
         />
       </div>
 
-      <Card className="mt-6 border-red-200 p-5">
+      <Card className="mt-6 border-red-200 dark:border-red-500/30 p-5">
         <div className="flex items-center gap-2">
-          <TriangleAlert size={16} className="text-red-500" />
-          <h2 className="font-semibold text-slate-900">Danger zone</h2>
+          <TriangleAlert size={16} className="text-red-500 dark:text-red-400" />
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Danger zone</h2>
         </div>
         {!deleteOpen ? (
           <>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Permanently delete this school and everything under it — users, compliance records, and
               Filtering &amp; Monitoring checks. This can&apos;t be undone. Suspending is usually what you
               want instead.
@@ -410,7 +410,7 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
           </>
         ) : (
           <div className="mt-3 space-y-3">
-            <p className="text-sm text-slate-700">
+            <p className="text-sm text-slate-700 dark:text-slate-300">
               This will permanently delete <span className="font-semibold">{school.name}</span> and all of
               its data. Type the school name to confirm.
             </p>
@@ -420,7 +420,7 @@ export function SchoolManage({ tenantId }: { tenantId: string }) {
               placeholder={school.name}
               className={inputClass}
             />
-            {deleteError && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{deleteError}</p>}
+            {deleteError && <p className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{deleteError}</p>}
             <div className="flex items-center gap-3">
               <Button
                 variant="danger"

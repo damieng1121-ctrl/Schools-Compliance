@@ -14,7 +14,7 @@ function GoogleError() {
   const error = params.get("error");
   if (!error) return null;
   return (
-    <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+    <p className="mt-4 rounded-lg bg-red-50 dark:bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300">
       {error === "AccessDenied"
         ? "That Google account isn't set up for this dashboard. Ask your school's admin to add you first, or contact the platform team."
         : "Something went wrong signing you in with Google. Please try again."}
@@ -26,7 +26,7 @@ function TimeoutNotice() {
   const params = useSearchParams();
   if (!params.get("timeout")) return null;
   return (
-    <p className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
+    <p className="mb-4 rounded-lg bg-amber-50 dark:bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
       You were signed out after 5 minutes of inactivity. Any unsaved changes were saved first — please sign in
       again.
     </p>
@@ -40,7 +40,7 @@ type Stage =
   | { name: "backup-codes"; codes: string[] };
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100";
+  "mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2.5 text-sm focus:border-slate-400 dark:focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100 dark:focus:ring-slate-800";
 
 function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) => void }) {
   const router = useRouter();
@@ -138,7 +138,7 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
   if (stage.name === "setup") {
     return (
       <form onSubmit={(e) => onSetupSubmit(e, stage)} className="mt-6 space-y-4 text-left">
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           Set up two-factor authentication: scan this QR code with an authenticator app (Google Authenticator, Authy,
           1Password, etc.), then enter the 6-digit code it shows.
         </p>
@@ -146,9 +146,9 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
         <img
           src={stage.qrDataUrl}
           alt="2FA setup QR code"
-          className="mx-auto h-40 w-40 rounded-lg border border-slate-200"
+          className="mx-auto h-40 w-40 rounded-lg border border-slate-200 dark:border-slate-700"
         />
-        <p className="break-all rounded-lg bg-slate-50 px-3 py-2 text-center font-mono text-xs text-slate-500">
+        <p className="break-all rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-center font-mono text-xs text-slate-500 dark:text-slate-400">
           {stage.secret}
         </p>
         {/* Decoy username+password pair so the browser's password manager has
@@ -159,7 +159,7 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
         <input type="text" name="username" autoComplete="username" value={stage.email} readOnly className="sr-only" tabIndex={-1} aria-hidden />
         <input type="password" name="password" autoComplete="current-password" value={stage.password} readOnly className="sr-only" tabIndex={-1} aria-hidden />
         <div>
-          <label className="block text-xs font-medium text-slate-600">6-digit code</label>
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">6-digit code</label>
           <input
             name="code"
             inputMode="numeric"
@@ -170,7 +170,7 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
             className={inputClass}
           />
         </div>
-        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{error}</p>}
         <Button type="submit" disabled={loading} className="w-full">
           {loading ? "Verifying…" : "Verify & enable"}
         </Button>
@@ -180,7 +180,7 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
             setStage({ name: "credentials" });
             setError(null);
           }}
-          className="block w-full text-center text-xs text-slate-400 hover:text-slate-600 hover:underline"
+          className="block w-full text-center text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:underline"
         >
           Back
         </button>
@@ -199,7 +199,7 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
         <input type="text" name="username" autoComplete="username" value={stage.email} readOnly className="sr-only" tabIndex={-1} aria-hidden />
         <input type="password" name="password" autoComplete="current-password" value={stage.password} readOnly className="sr-only" tabIndex={-1} aria-hidden />
         <div>
-          <label className="block text-xs font-medium text-slate-600">
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
             {stage.useBackupCode ? "Backup code" : "Authentication code"}
           </label>
           <input
@@ -213,7 +213,7 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
             className={inputClass}
           />
         </div>
-        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{error}</p>}
         <Button type="submit" disabled={loading} className="w-full">
           {loading ? "Signing in…" : "Sign in"}
         </Button>
@@ -223,7 +223,7 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
             setStage({ ...stage, useBackupCode: !stage.useBackupCode });
             setError(null);
           }}
-          className="block w-full text-center text-xs text-slate-400 hover:text-slate-600 hover:underline"
+          className="block w-full text-center text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:underline"
         >
           {stage.useBackupCode ? "Use your authenticator app instead" : "Use a backup code instead"}
         </button>
@@ -234,11 +234,11 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
   if (stage.name === "backup-codes") {
     return (
       <div className="mt-6 space-y-4 text-left">
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           Save these one-time backup codes somewhere safe — each can be used once to sign in if you lose access to
           your authenticator app. They won&apos;t be shown again.
         </p>
-        <div className="grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-3 font-mono text-xs text-slate-700">
+        <div className="grid grid-cols-2 gap-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 p-3 font-mono text-xs text-slate-700 dark:text-slate-300">
           {stage.codes.map((c) => (
             <span key={c}>{c}</span>
           ))}
@@ -253,14 +253,14 @@ function LoginForm({ onStageChange }: { onStageChange: (isCredentials: boolean) 
   return (
     <form onSubmit={onCredentialsSubmit} className="mt-6 space-y-4 text-left">
       <div>
-        <label className="block text-xs font-medium text-slate-600">Email</label>
+        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Email</label>
         <input name="email" type="email" required className={inputClass} />
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-600">Password</label>
+        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Password</label>
         <input name="password" type="password" required className={inputClass} />
       </div>
-      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{error}</p>}
       <Button type="submit" disabled={loading} className="w-full">
         {loading ? "Checking…" : "Continue"}
       </Button>
@@ -320,8 +320,8 @@ export default function LoginPage() {
       <div className="mx-auto mb-4 lg:hidden">
         <PlatformBadge />
       </div>
-      <h1 className="text-xl font-bold tracking-tight text-slate-900">Sign in</h1>
-      <p className="mt-1.5 text-sm text-slate-500">Sign in to your school&apos;s compliance dashboard.</p>
+      <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Sign in</h1>
+      <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">Sign in to your school&apos;s compliance dashboard.</p>
       <div className="mt-4">
         <Suspense fallback={null}>
           <TimeoutNotice />
@@ -332,10 +332,10 @@ export default function LoginPage() {
       </Suspense>
       {showGoogle && (
         <>
-          <div className="mt-6 flex items-center gap-3 text-xs font-medium text-slate-400">
-            <div className="h-px flex-1 bg-slate-200" />
+          <div className="mt-6 flex items-center gap-3 text-xs font-medium text-slate-400 dark:text-slate-500">
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
             or
-            <div className="h-px flex-1 bg-slate-200" />
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
           </div>
           <GoogleSignInButton />
           <Suspense fallback={null}>
@@ -343,12 +343,12 @@ export default function LoginPage() {
           </Suspense>
         </>
       )}
-      <p className="mt-6 text-xs text-slate-400">
-        <Link href="/privacy" className="hover:text-slate-600 hover:underline">
+      <p className="mt-6 text-xs text-slate-400 dark:text-slate-500">
+        <Link href="/privacy" className="hover:text-slate-600 dark:hover:text-slate-300 hover:underline">
           Privacy
         </Link>{" "}
         &middot;{" "}
-        <Link href="/terms" className="hover:text-slate-600 hover:underline">
+        <Link href="/terms" className="hover:text-slate-600 dark:hover:text-slate-300 hover:underline">
           Terms
         </Link>{" "}
         &middot;{" "}
@@ -356,7 +356,7 @@ export default function LoginPage() {
           href="https://www.education-lincs.com/contact/contact.html"
           target="_blank"
           rel="noreferrer"
-          className="hover:text-slate-600 hover:underline"
+          className="hover:text-slate-600 dark:hover:text-slate-300 hover:underline"
         >
           Contact us
         </a>

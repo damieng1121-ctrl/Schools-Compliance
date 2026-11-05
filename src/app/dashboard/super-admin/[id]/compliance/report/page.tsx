@@ -46,7 +46,7 @@ export default function SuperAdminComplianceReportPage({ params }: PageProps<"/d
     });
   }, [tenantId]);
 
-  if (!standards || !tenant) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!standards || !tenant) return <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p>;
 
   return (
     <ComplianceReportView

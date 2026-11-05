@@ -7,16 +7,16 @@ export type CriterionLevel = { value: string; label: string; rating: Rating };
 export type Criterion = { id: string; label: string; levels: CriterionLevel[] };
 
 const DOT_COLOR: Record<Rating | "NONE", string> = {
-  NONE: "bg-slate-300",
+  NONE: "bg-slate-300 dark:bg-slate-600",
   RED: "bg-red-500",
   AMBER: "bg-amber-500",
   GREEN: "bg-emerald-500",
 };
 const SELECT_STYLE: Record<Rating | "NONE", string> = {
-  NONE: "border-slate-200 text-slate-700",
-  RED: "border-red-300 bg-red-50 text-red-800",
-  AMBER: "border-amber-300 bg-amber-50 text-amber-800",
-  GREEN: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  NONE: "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300",
+  RED: "border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 text-red-800 dark:text-red-300",
+  AMBER: "border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300",
+  GREEN: "border-emerald-300 dark:border-emerald-500/40 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300",
 };
 
 /**
@@ -39,15 +39,15 @@ export function CriteriaTrafficLight({
   if (criteria.length === 0) return null;
 
   return (
-    <div className="space-y-3 rounded-lg border border-slate-200 p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Technical check</p>
+    <div className="space-y-3 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Technical check</p>
       {criteria.map((criterion) => {
         const selectedValue = answers[criterion.id] ?? "";
         const selectedLevel = criterion.levels.find((l) => l.value === selectedValue);
         const rating = selectedLevel?.rating ?? "NONE";
         return (
           <div key={criterion.id}>
-            <p className="text-xs font-medium text-slate-700">{criterion.label}</p>
+            <p className="text-xs font-medium text-slate-700 dark:text-slate-300">{criterion.label}</p>
             <div className="relative mt-1.5">
               <span
                 className={clsx("pointer-events-none absolute left-3 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full", DOT_COLOR[rating])}
@@ -56,7 +56,7 @@ export function CriteriaTrafficLight({
                 value={selectedValue}
                 onChange={(e) => onChange(criterion.id, e.target.value)}
                 className={clsx(
-                  "w-full appearance-none rounded-lg border py-2 pl-7 pr-8 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-slate-100",
+                  "w-full appearance-none rounded-lg border py-2 pl-7 pr-8 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-slate-100 dark:focus:ring-slate-800",
                   SELECT_STYLE[rating],
                 )}
               >
@@ -70,7 +70,7 @@ export function CriteriaTrafficLight({
                 ))}
               </select>
               <svg
-                className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                 viewBox="0 0 20 20"
                 fill="currentColor"
                 aria-hidden

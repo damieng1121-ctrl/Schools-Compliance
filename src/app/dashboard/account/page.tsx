@@ -37,12 +37,12 @@ export default function AccountPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Account</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Account</h1>
       <div className="mt-6 grid grid-cols-1 gap-6 sm:max-w-sm">
         <Card className="p-5">
           <div className="flex items-center gap-2">
-            <KeyRound size={16} className="text-slate-400" />
-            <h2 className="font-semibold text-slate-900">Change password</h2>
+            <KeyRound size={16} className="text-slate-400 dark:text-slate-500" />
+            <h2 className="font-semibold text-slate-900 dark:text-slate-100">Change password</h2>
           </div>
           <form onSubmit={onSubmit} className="mt-3 space-y-3">
             <div>
@@ -68,7 +68,7 @@ export default function AccountPage() {
             </div>
             {message && (
               <p
-                className={`rounded-lg px-3 py-2 text-sm ${message.type === "ok" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}
+                className={`rounded-lg px-3 py-2 text-sm ${message.type === "ok" ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300"}`}
               >
                 {message.text}
               </p>
@@ -142,16 +142,16 @@ function TwoFactorCard() {
     return (
       <Card className="p-5">
         <div className="flex items-center gap-2">
-          <ShieldCheck size={16} className="text-slate-400" />
-          <h2 className="font-semibold text-slate-900">Set up 2FA on a new device</h2>
+          <ShieldCheck size={16} className="text-slate-400 dark:text-slate-500" />
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Set up 2FA on a new device</h2>
         </div>
-        <p className="mt-1 text-sm text-slate-500">Confirm your password to continue.</p>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Confirm your password to continue.</p>
         <form onSubmit={onPasswordSubmit} className="mt-3 space-y-3">
           <div>
             <label className={labelClass}>Current password</label>
             <input name="currentPassword" type="password" required autoFocus className={inputClass} />
           </div>
-          {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+          {error && <p className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{error}</p>}
           <div className="flex items-center gap-2">
             <Button type="submit" disabled={loading}>
               {loading ? "Checking…" : "Continue"}
@@ -169,24 +169,24 @@ function TwoFactorCard() {
     return (
       <Card className="p-5">
         <div className="flex items-center gap-2">
-          <ShieldCheck size={16} className="text-slate-400" />
-          <h2 className="font-semibold text-slate-900">Scan this QR code</h2>
+          <ShieldCheck size={16} className="text-slate-400 dark:text-slate-500" />
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Scan this QR code</h2>
         </div>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Scan with your authenticator app, then enter the 6-digit code it shows. This replaces your current 2FA —
           your old authenticator and backup codes will stop working once confirmed.
         </p>
         <form onSubmit={(e) => onCodeSubmit(e, stage)} className="mt-3 space-y-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={stage.qrDataUrl} alt="2FA setup QR code" className="mx-auto h-40 w-40 rounded-lg border border-slate-200" />
-          <p className="break-all rounded-lg bg-slate-50 px-3 py-2 text-center font-mono text-xs text-slate-500">
+          <img src={stage.qrDataUrl} alt="2FA setup QR code" className="mx-auto h-40 w-40 rounded-lg border border-slate-200 dark:border-slate-700" />
+          <p className="break-all rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-center font-mono text-xs text-slate-500 dark:text-slate-400">
             {stage.secret}
           </p>
           <div>
             <label className={labelClass}>6-digit code</label>
             <input name="code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} required autoFocus className={inputClass} />
           </div>
-          {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+          {error && <p className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{error}</p>}
           <div className="flex items-center gap-2">
             <Button type="submit" disabled={loading}>
               {loading ? "Verifying…" : "Verify & save"}
@@ -204,14 +204,14 @@ function TwoFactorCard() {
     return (
       <Card className="p-5">
         <div className="flex items-center gap-2">
-          <ShieldCheck size={16} className="text-emerald-600" />
-          <h2 className="font-semibold text-slate-900">2FA updated</h2>
+          <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">2FA updated</h2>
         </div>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
           Save these new backup codes somewhere safe — each works once if you lose access to your authenticator app.
           Your old backup codes no longer work.
         </p>
-        <div className="mt-3 grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-3 font-mono text-xs text-slate-700">
+        <div className="mt-3 grid grid-cols-2 gap-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 p-3 font-mono text-xs text-slate-700 dark:text-slate-300">
           {stage.codes.map((c) => (
             <span key={c}>{c}</span>
           ))}
@@ -226,10 +226,10 @@ function TwoFactorCard() {
   return (
     <Card className="p-5">
       <div className="flex items-center gap-2">
-        <ShieldCheck size={16} className="text-slate-400" />
-        <h2 className="font-semibold text-slate-900">Two-factor authentication</h2>
+        <ShieldCheck size={16} className="text-slate-400 dark:text-slate-500" />
+        <h2 className="font-semibold text-slate-900 dark:text-slate-100">Two-factor authentication</h2>
       </div>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
         2FA is required and already set up on this account. Getting a new phone or lost your authenticator app? Set
         it up again here.
       </p>

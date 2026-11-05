@@ -40,9 +40,9 @@ type Item = {
 };
 
 const PRIORITY_STYLES: Record<Item["priority"], string> = {
-  HIGH: "bg-red-50 text-red-600",
-  MEDIUM: "bg-amber-50 text-amber-600",
-  LOW: "bg-slate-100 text-slate-500",
+  HIGH: "bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400",
+  MEDIUM: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  LOW: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400",
 };
 type StandardEvidence = { evidenceUrl: string | null; updatedAt: string | null };
 type Standard = {
@@ -72,7 +72,7 @@ export default function CompliancePage() {
 
   useEffect(load, []);
 
-  if (!standards) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!standards) return <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p>;
 
   const allItems = standards.flatMap((s) => s.items);
   const compliant = allItems.filter((i) => i.assessment.status === "COMPLIANT").length;
@@ -85,15 +85,15 @@ export default function CompliancePage() {
     <div>
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">DfE digital &amp; technology standards</h1>
-          <p className="mt-1 max-w-2xl text-sm text-slate-500">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">DfE digital &amp; technology standards</h1>
+          <p className="mt-1 max-w-2xl text-sm text-slate-500 dark:text-slate-400">
             Track your school&apos;s readiness against the DfE&apos;s digital and technology standards for
             schools and colleges. This is a working self-assessment tool — always check{" "}
             <a
               href="https://www.gov.uk/guidance/meeting-digital-and-technology-standards-in-schools-and-colleges"
               target="_blank"
               rel="noreferrer"
-              className="font-medium text-slate-900 hover:underline"
+              className="font-medium text-slate-900 dark:text-slate-100 hover:underline"
             >
               the latest official guidance on GOV.UK
             </a>{" "}
@@ -113,19 +113,19 @@ export default function CompliancePage() {
 
       <Card className="mt-5 p-5">
         <div className="flex items-center justify-between text-sm">
-          <p className="font-semibold text-slate-900">Overall readiness</p>
-          <p className="text-slate-500">
-            <span className="font-semibold text-slate-900">{compliant}</span> / {allItems.length} standards met
+          <p className="font-semibold text-slate-900 dark:text-slate-100">Overall readiness</p>
+          <p className="text-slate-500 dark:text-slate-400">
+            <span className="font-semibold text-slate-900 dark:text-slate-100">{compliant}</span> / {allItems.length} standards met
           </p>
         </div>
-        <div className="mt-2.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-2.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <div
             className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-[width] duration-500"
             style={{ width: `${overallPct}%` }}
           />
         </div>
-        <p className="mt-3 text-xs text-slate-400">
-          <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-slate-900 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-white">
+        <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">
+          <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-slate-900 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-white dark:bg-slate-100 dark:text-slate-900">
             Core standard
           </span>
           marks the 6 standards DfE expects every school and college to meet by 2030 — the minimum baseline. The
@@ -134,7 +134,7 @@ export default function CompliancePage() {
       </Card>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs font-medium text-slate-500">Show items for</p>
+        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Show items for</p>
         <AudienceFilter value={audienceFilter} onChange={setAudienceFilter} />
       </div>
 
@@ -166,20 +166,20 @@ export default function CompliancePage() {
             .filter((standard) => standard.id === activeTab)
             .map((standard) => (
               <Card key={standard.id} className="mt-5 overflow-hidden">
-                <div className="border-b border-slate-100 p-5">
+                <div className="border-b border-slate-100 dark:border-slate-800 p-5">
                   <div className="flex items-center justify-between gap-3">
-                    <h2 className="flex items-center gap-2 font-semibold text-slate-900">
+                    <h2 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
                       {standard.title}
                       {isCoreStandard(standard.code) && <CoreStandardBadge />}
                     </h2>
                   </div>
-                  <p className="mt-1 text-sm text-slate-500">{standard.description}</p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{standard.description}</p>
                   {standard.officialUrl && (
                     <a
                       href={standard.officialUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-slate-900 hover:underline"
+                      className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-slate-900 dark:text-slate-100 hover:underline"
                     >
                       Official DfE guidance
                       <ExternalLink size={11} />
@@ -187,7 +187,7 @@ export default function CompliancePage() {
                   )}
                 </div>
                 <StandardEvidenceArea endpoint={`/api/compliance/evidence/${standard.id}`} evidence={standard.evidence} />
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-slate-100 dark:divide-slate-800">
                   {visibleItems(standard).map((item) => (
                     <ComplianceItemRow
                       key={item.id}
@@ -198,7 +198,7 @@ export default function CompliancePage() {
                     />
                   ))}
                   {visibleItems(standard).length === 0 && (
-                    <p className="px-5 py-6 text-sm text-slate-500">No items for this role under this standard.</p>
+                    <p className="px-5 py-6 text-sm text-slate-500 dark:text-slate-400">No items for this role under this standard.</p>
                   )}
                 </div>
               </Card>
@@ -269,37 +269,37 @@ function ComplianceItemRow({
   const setNotesValue = item.audience === "TECHNICIAN" ? setTechnicianNotes : setSltNotes;
 
   return (
-    <div className="transition-colors hover:bg-slate-50/60">
+    <div className="transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
       <button onClick={onToggle} className="flex w-full items-center gap-3 px-5 py-4 text-left">
         <ChevronDown
           size={16}
-          className={clsx("shrink-0 text-slate-400 transition-transform", open && "rotate-180")}
+          className={clsx("shrink-0 text-slate-400 dark:text-slate-500 transition-transform", open && "rotate-180")}
         />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="font-medium text-slate-900">{item.title}</p>
+            <p className="font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
             <AudienceBadge audience={item.audience} />
             <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${PRIORITY_STYLES[item.priority]}`}>
               {item.priority}
             </span>
           </div>
-          <p className="mt-0.5 truncate text-sm text-slate-500">{item.description}</p>
+          <p className="mt-0.5 truncate text-sm text-slate-500 dark:text-slate-400">{item.description}</p>
         </div>
         <ComplianceBadge status={item.assessment.status} />
       </button>
 
       {open && (
         <div className="animate-fade-in space-y-4 px-5 pb-5 pl-11">
-          <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">In plain English</p>
-            <p className="mt-1 text-sm text-slate-700">{item.description}</p>
-            {item.guidance && <p className="mt-1.5 text-sm font-medium text-slate-900">{item.guidance}</p>}
+          <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">In plain English</p>
+            <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">{item.description}</p>
+            {item.guidance && <p className="mt-1.5 text-sm font-medium text-slate-900 dark:text-slate-100">{item.guidance}</p>}
           </div>
 
           {item.sourceText && (
-            <div className="rounded-lg border border-slate-200 p-3">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-900">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-900 dark:text-slate-100">
                   What the DfE standard says, word for word
                 </p>
                 {item.govLink && (
@@ -307,7 +307,7 @@ function ComplianceItemRow({
                     href={item.govLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 hover:underline"
+                    className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:underline"
                   >
                     View on GOV.UK
                     <ExternalLink size={11} />
@@ -332,11 +332,11 @@ function ComplianceItemRow({
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-medium text-slate-600">Status</label>
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Status</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as Assessment["status"])}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 text-sm focus:border-slate-400 dark:focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100 dark:focus:ring-slate-800"
               >
                 <option value="NOT_STARTED">Not started</option>
                 <option value="IN_PROGRESS">In progress</option>
@@ -346,22 +346,22 @@ function ComplianceItemRow({
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-600">Next review due</label>
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Next review due</label>
               <input
                 type="date"
                 value={nextReviewDue}
                 onChange={(e) => setNextReviewDue(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 text-sm focus:border-slate-400 dark:focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100 dark:focus:ring-slate-800"
               />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-600">{notesLabel}</label>
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">{notesLabel}</label>
             <textarea
               rows={2}
               value={notesValue}
               onChange={(e) => setNotesValue(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
+              className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 text-sm focus:border-slate-400 dark:focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100 dark:focus:ring-slate-800"
               placeholder="e.g. current setup, what's been checked, what's outstanding"
             />
           </div>

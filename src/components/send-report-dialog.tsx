@@ -84,50 +84,50 @@ export function SendReportDialog({
       {open && (
         <Card className="absolute right-0 top-full z-20 mt-2 w-80 max-w-[90vw] p-4 text-left shadow-lg">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-slate-900">Send report to…</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Send report to…</p>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="text-xs font-medium text-slate-400 hover:text-slate-600"
+              className="text-xs font-medium text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
             >
               Close
             </button>
           </div>
 
           {recipients === null ? (
-            <p className="mt-3 text-sm text-slate-500">Loading…</p>
+            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">Loading…</p>
           ) : (
             <div className="mt-3 max-h-48 space-y-1.5 overflow-y-auto">
               {recipients.map((r) => (
-                <label key={r.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-slate-50">
+                <label key={r.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-slate-50 dark:hover:bg-slate-800/60">
                   <input
                     type="checkbox"
                     checked={selected.has(r.id)}
                     onChange={() => toggle(r.id)}
-                    className="h-4 w-4 rounded border-slate-300"
+                    className="h-4 w-4 rounded border-slate-300 dark:border-slate-600"
                   />
-                  <span className="min-w-0 flex-1 truncate text-sm text-slate-700">
-                    {r.name ?? r.email} <span className="text-slate-400">· {r.email}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm text-slate-700 dark:text-slate-300">
+                    {r.name ?? r.email} <span className="text-slate-400 dark:text-slate-500">· {r.email}</span>
                   </span>
                 </label>
               ))}
-              {recipients.length === 0 && <p className="px-1.5 py-1 text-sm text-slate-500">No one to select yet.</p>}
+              {recipients.length === 0 && <p className="px-1.5 py-1 text-sm text-slate-500 dark:text-slate-400">No one to select yet.</p>}
             </div>
           )}
 
           <div className="mt-3">
-            <label className="block text-xs font-medium text-slate-600">Other email addresses</label>
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Other email addresses</label>
             <textarea
               value={extraEmails}
               onChange={(e) => setExtraEmails(e.target.value)}
               placeholder="one per line, or comma-separated"
               rows={2}
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
+              className="mt-1 w-full rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm focus:border-slate-400 dark:focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100 dark:focus:ring-slate-800"
             />
           </div>
 
           {result && (
-            <p className={`mt-3 rounded-lg px-3 py-2 text-xs ${result.type === "ok" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+            <p className={`mt-3 rounded-lg px-3 py-2 text-xs ${result.type === "ok" ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300"}`}>
               {result.text}
             </p>
           )}

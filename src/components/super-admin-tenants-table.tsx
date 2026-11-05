@@ -72,10 +72,10 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
     <div className="space-y-6">
       <Card className="p-5">
         <div className="flex items-center gap-2">
-          <PlusCircle size={16} className="text-slate-400" />
-          <h2 className="font-semibold text-slate-900">Add a school</h2>
+          <PlusCircle size={16} className="text-slate-400 dark:text-slate-500" />
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Add a school</h2>
         </div>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Creates the school and its first admin, who gets emailed a temporary password.
         </p>
         <form onSubmit={addSchool} className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-4 sm:items-end">
@@ -107,24 +107,24 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
             {adding ? "Adding…" : "Add school"}
           </Button>
         </form>
-        {addError && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{addError}</p>}
+        {addError && <p className="mt-3 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{addError}</p>}
       </Card>
 
-      <Card className="divide-y divide-slate-100 sm:hidden">
+      <Card className="divide-y divide-slate-100 dark:divide-slate-800 sm:hidden">
         {tenants.map((t) => {
           const pct = t.totalItems ? Math.round((t.compliantCount / t.totalItems) * 100) : 0;
           return (
             <div key={t.id} className="space-y-3 p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <Link href={`/dashboard/super-admin/${t.id}`} className="font-medium text-slate-900 hover:underline">
+                  <Link href={`/dashboard/super-admin/${t.id}`} className="font-medium text-slate-900 dark:text-slate-100 hover:underline">
                     {t.name}
                   </Link>
-                  <p className="text-xs text-slate-500">{t.slug}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{t.slug}</p>
                 </div>
                 <span
                   className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    t.isActive ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+                    t.isActive ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300"
                   }`}
                 >
                   <span className={`h-1.5 w-1.5 rounded-full ${t.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
@@ -132,12 +132,12 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                   <div className="h-full rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
                 </div>
-                <span className="shrink-0 text-xs font-medium text-slate-500">{pct}% ready</span>
+                <span className="shrink-0 text-xs font-medium text-slate-500 dark:text-slate-400">{pct}% ready</span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {t.userCount} user{t.userCount === 1 ? "" : "s"} · Added {new Date(t.createdAt).toLocaleDateString("en-GB")}
               </p>
               <div className="flex gap-2">
@@ -159,12 +159,12 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
             </div>
           );
         })}
-        {tenants.length === 0 && <p className="px-5 py-6 text-center text-slate-500">No schools yet.</p>}
+        {tenants.length === 0 && <p className="px-5 py-6 text-center text-slate-500 dark:text-slate-400">No schools yet.</p>}
       </Card>
 
       <Card className="hidden overflow-x-auto sm:block">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          <thead className="border-b border-slate-100 dark:border-slate-800 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
             <tr>
               <th className="px-5 py-3 font-semibold">School</th>
               <th className="px-5 py-3 font-semibold">Users</th>
@@ -174,37 +174,37 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
               <th className="px-5 py-3 font-semibold"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {tenants.map((t) => {
               const pct = t.totalItems ? Math.round((t.compliantCount / t.totalItems) * 100) : 0;
               return (
-                <tr key={t.id} className="transition-colors hover:bg-slate-50/60">
+                <tr key={t.id} className="transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
                   <td className="px-5 py-3">
-                    <Link href={`/dashboard/super-admin/${t.id}`} className="font-medium text-slate-900 hover:underline">
+                    <Link href={`/dashboard/super-admin/${t.id}`} className="font-medium text-slate-900 dark:text-slate-100 hover:underline">
                       {t.name}
                     </Link>
-                    <p className="text-xs text-slate-500">{t.slug}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{t.slug}</p>
                   </td>
-                  <td className="px-5 py-3 text-slate-600">{t.userCount}</td>
+                  <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{t.userCount}</td>
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-100">
+                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                         <div className="h-full rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="text-xs font-medium text-slate-500">{pct}%</span>
+                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{pct}%</span>
                     </div>
                   </td>
                   <td className="px-5 py-3">
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        t.isActive ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+                        t.isActive ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300"
                       }`}
                     >
                       <span className={`h-1.5 w-1.5 rounded-full ${t.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
                       {t.isActive ? "Active" : "Suspended"}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-slate-600">{new Date(t.createdAt).toLocaleDateString("en-GB")}</td>
+                  <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{new Date(t.createdAt).toLocaleDateString("en-GB")}</td>
                   <td className="px-5 py-3 text-right">
                     <div className="flex justify-end gap-2">
                       <Link href={`/dashboard/super-admin/${t.id}`}>
@@ -222,7 +222,7 @@ export function SuperAdminTenantsTable({ initialTenants }: { initialTenants: Ten
             })}
             {tenants.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-6 text-center text-slate-500">
+                <td colSpan={6} className="px-5 py-6 text-center text-slate-500 dark:text-slate-400">
                   No schools yet.
                 </td>
               </tr>

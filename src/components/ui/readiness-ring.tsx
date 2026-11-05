@@ -23,7 +23,7 @@ export function ReadinessRing({ pct, size = 96 }: { pct: number; size?: number }
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl font-bold text-slate-900">{clamped}%</span>
+        <span className="text-xl font-bold text-slate-900 dark:text-slate-100">{clamped}%</span>
       </div>
     </div>
   );

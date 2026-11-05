@@ -16,9 +16,9 @@ const AUDIENCE_ICON: Record<Audience, LucideIcon> = {
 };
 
 const AUDIENCE_STYLE: Record<Audience, string> = {
-  TECHNICIAN: "bg-sky-50 text-sky-700",
+  TECHNICIAN: "bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300",
   SLT: "bg-violet-50 text-violet-700",
-  DSL: "bg-rose-50 text-rose-700",
+  DSL: "bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300",
 };
 
 /** Who's responsible for answering a compliance item. */

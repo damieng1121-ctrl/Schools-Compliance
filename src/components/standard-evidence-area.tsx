@@ -28,12 +28,12 @@ export function StandardEvidenceArea({ endpoint, evidence }: { endpoint: string;
   }
 
   return (
-    <div className="border-b border-slate-100 bg-slate-50/60 p-5">
+    <div className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 p-5">
       <div className="flex items-center gap-2">
-        <FolderOpen size={15} className="text-slate-400" />
-        <p className="text-sm font-semibold text-slate-900">Evidence</p>
+        <FolderOpen size={15} className="text-slate-400 dark:text-slate-500" />
+        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Evidence</p>
       </div>
-      <p className="mt-1 text-xs text-slate-500">
+      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
         One link covering this whole standard — a Google Drive folder works well. Share it with &ldquo;Anyone with
         the link&rdquo; (or your reviewers directly), not restricted to your school&apos;s internal Drive users.
       </p>
@@ -42,7 +42,7 @@ export function StandardEvidenceArea({ endpoint, evidence }: { endpoint: string;
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://drive.google.com/…"
-          className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
+          className="min-w-0 flex-1 rounded-lg border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 text-sm focus:border-slate-400 dark:focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100 dark:focus:ring-slate-800"
         />
         <Button size="sm" onClick={save} disabled={saving}>
           {justSaved && <Check size={14} />}
@@ -50,7 +50,7 @@ export function StandardEvidenceArea({ endpoint, evidence }: { endpoint: string;
         </Button>
       </div>
       {evidence.updatedAt && (
-        <p className="mt-1.5 text-xs text-slate-400">
+        <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
           Last updated {new Date(evidence.updatedAt).toLocaleDateString("en-GB")}
           {evidence.updatedByName ? ` by ${evidence.updatedByName}` : ""}
         </p>

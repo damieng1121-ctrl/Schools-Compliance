@@ -82,14 +82,14 @@ export function ComplianceLogs({ endpoint }: { endpoint: string }) {
     URL.revokeObjectURL(url);
   }
 
-  if (!logs) return <p className="p-5 text-sm text-slate-500">Loading…</p>;
+  if (!logs) return <p className="p-5 text-sm text-slate-500 dark:text-slate-400">Loading…</p>;
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-3 print:hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 px-5 py-3 print:hidden">
         <div>
-          <h2 className="font-semibold text-slate-900">Activity log</h2>
-          <p className="text-xs text-slate-500">
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Activity log</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Every change made to a compliance answer, with who made it and when — most recent {logs.length} entries.
           </p>
         </div>
@@ -106,29 +106,29 @@ export function ComplianceLogs({ endpoint }: { endpoint: string }) {
       </div>
 
       <div className="hidden items-center justify-between px-5 pt-5 print:flex">
-        <h2 className="font-semibold text-slate-900">Compliance activity log</h2>
-        <p className="text-xs text-slate-500">Printed {new Date().toLocaleString("en-GB")}</p>
+        <h2 className="font-semibold text-slate-900 dark:text-slate-100">Compliance activity log</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Printed {new Date().toLocaleString("en-GB")}</p>
       </div>
 
       {logs.length === 0 ? (
-        <p className="p-5 text-sm text-slate-500">No changes have been logged yet.</p>
+        <p className="p-5 text-sm text-slate-500 dark:text-slate-400">No changes have been logged yet.</p>
       ) : (
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-slate-100 dark:divide-slate-800">
           {logs.map((log) => {
             const m = log.metadata ?? {};
             return (
               <div key={log.id} className="break-inside-avoid px-5 py-3.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-medium text-slate-900">
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                     {m.standardTitle ?? "Compliance item"}
-                    {m.itemTitle && <span className="font-normal text-slate-500"> — {m.itemTitle}</span>}
+                    {m.itemTitle && <span className="font-normal text-slate-500 dark:text-slate-400"> — {m.itemTitle}</span>}
                   </p>
-                  <p className="text-xs text-slate-400">{new Date(log.createdAt).toLocaleString("en-GB")}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{new Date(log.createdAt).toLocaleString("en-GB")}</p>
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                   <span>{log.userName}</span>
                   {log.action === "compliance.assessed_by_super_admin" && (
-                    <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
+                    <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
                       Platform admin
                     </span>
                   )}
@@ -145,19 +145,19 @@ export function ComplianceLogs({ endpoint }: { endpoint: string }) {
                   )}
                 </div>
                 {m.technicianNotes && (
-                  <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600">
-                    <span className="font-medium text-slate-500">Technician: </span>
+                  <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600 dark:text-slate-300">
+                    <span className="font-medium text-slate-500 dark:text-slate-400">Technician: </span>
                     {m.technicianNotes}
                   </p>
                 )}
                 {(m.sltNotes || m.evidenceNotes) && (
-                  <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600">
-                    <span className="font-medium text-slate-500">SLT: </span>
+                  <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600 dark:text-slate-300">
+                    <span className="font-medium text-slate-500 dark:text-slate-400">SLT: </span>
                     {m.sltNotes ?? m.evidenceNotes}
                   </p>
                 )}
                 {m.nextReviewDue && (
-                  <div className="mt-1 flex flex-wrap gap-x-4 text-[11px] text-slate-400">
+                  <div className="mt-1 flex flex-wrap gap-x-4 text-[11px] text-slate-400 dark:text-slate-500">
                     <span>Next review due {new Date(m.nextReviewDue).toLocaleDateString("en-GB")}</span>
                   </div>
                 )}

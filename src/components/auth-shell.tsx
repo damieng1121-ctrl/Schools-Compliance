@@ -1,13 +1,15 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { PlatformBadge } from "@/components/platform-badge";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function AuthShell({ panel, children }: { panel: ReactNode; children: ReactNode }) {
   return (
-    <div className="flex flex-1">
+    <div className="relative flex flex-1">
+      <ThemeToggle className="absolute right-4 top-4 z-10 hover:bg-slate-100 dark:hover:bg-slate-800" />
       <div className="hidden w-[42%] shrink-0 lg:block">{panel}</div>
-      <div className="flex flex-1 items-center justify-center bg-[#f7f7f8] px-4 py-10 sm:px-6 sm:py-16">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] sm:p-8">
+      <div className="flex flex-1 items-center justify-center bg-[#f7f7f8] dark:bg-slate-950 px-4 py-10 sm:px-6 sm:py-16">
+        <div className="w-full max-w-sm rounded-2xl border border-slate-200/80 dark:border-slate-700/60 bg-white dark:bg-slate-900 p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04)] sm:p-8">
           {children}
         </div>
       </div>

@@ -49,10 +49,10 @@ export function PlatformAdminsTable({ initialAdmins }: { initialAdmins: Admin[] 
     <div className="space-y-6">
       <Card className="p-5">
         <div className="flex items-center gap-2">
-          <UserCog size={16} className="text-slate-400" />
-          <h2 className="font-semibold text-slate-900">Add a platform admin</h2>
+          <UserCog size={16} className="text-slate-400 dark:text-slate-500" />
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Add a platform admin</h2>
         </div>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           They can see and manage every school, just like you. They&apos;ll get an email with a temporary
           password.
         </p>
@@ -75,22 +75,22 @@ export function PlatformAdminsTable({ initialAdmins }: { initialAdmins: Admin[] 
             {adding ? "Adding…" : "Add admin"}
           </Button>
         </form>
-        {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p className="mt-3 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">{error}</p>}
       </Card>
 
       <Card>
-        <div className="border-b border-slate-100 px-5 py-3">
-          <h2 className="font-semibold text-slate-900">Platform admins ({admins.length})</h2>
+        <div className="border-b border-slate-100 dark:border-slate-800 px-5 py-3">
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Platform admins ({admins.length})</h2>
         </div>
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-slate-100 dark:divide-slate-800">
           {admins.map((a) => (
             <div key={a.id} className="flex items-center gap-3 px-5 py-3">
               <Avatar name={a.name ?? a.email} />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-900">{a.name ?? a.email}</p>
-                <p className="truncate text-xs text-slate-500">{a.email}</p>
+                <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">{a.name ?? a.email}</p>
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400">{a.email}</p>
               </div>
-              <span className="shrink-0 text-xs text-slate-500">
+              <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">
                 Added {new Date(a.createdAt).toLocaleDateString("en-GB")}
               </span>
             </div>

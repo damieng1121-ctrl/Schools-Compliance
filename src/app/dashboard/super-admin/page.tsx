@@ -42,8 +42,8 @@ export default async function SuperAdminPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900">All schools</h1>
-      <p className="mt-1 text-sm text-slate-500">Every school on the platform, across all tenants.</p>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">All schools</h1>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Every school on the platform, across all tenants.</p>
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Total schools" value={rows.length} icon={Building2} />

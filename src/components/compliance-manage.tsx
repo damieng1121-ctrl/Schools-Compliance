@@ -60,7 +60,7 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
 
   useEffect(load, [tenantId]);
 
-  if (!standards) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!standards) return <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p>;
 
   const answered = standards.flatMap((s) => s.items).filter((i) => i.assessment.status !== "NOT_STARTED").length;
   const total = standards.reduce((n, s) => n + s.items.length, 0);
@@ -70,10 +70,10 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
 
   return (
     <Card>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 px-5 py-3">
         <div>
-          <h2 className="font-semibold text-slate-900">Compliance responses</h2>
-          <p className="text-xs text-slate-500">{answered}/{total} items answered</p>
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Compliance responses</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{answered}/{total} items answered</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link href={`/dashboard/super-admin/${tenantId}/compliance/report`}>
@@ -92,8 +92,8 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
           />
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-3">
-        <p className="text-xs font-medium text-slate-500">Show items for</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 px-5 py-3">
+        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Show items for</p>
         <AudienceFilter value={audienceFilter} onChange={setAudienceFilter} />
       </div>
       <div className="px-5 pt-3">
@@ -126,7 +126,7 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
                 endpoint={`/api/super-admin/tenants/${tenantId}/compliance/evidence/${standard.id}`}
                 evidence={standard.evidence}
               />
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {visibleItems(standard).map((item) => (
                   <ComplianceManageRow
                     key={item.id}
@@ -138,7 +138,7 @@ export function ComplianceManage({ tenantId }: { tenantId: string }) {
                   />
                 ))}
                 {visibleItems(standard).length === 0 && (
-                  <p className="px-5 py-6 text-sm text-slate-500">No items for this role under this standard.</p>
+                  <p className="px-5 py-6 text-sm text-slate-500 dark:text-slate-400">No items for this role under this standard.</p>
                 )}
               </div>
             </div>
@@ -210,24 +210,24 @@ function ComplianceManageRow({
   const setNotesValue = item.audience === "TECHNICIAN" ? setTechnicianNotes : setSltNotes;
 
   return (
-    <div className="border-t border-slate-50">
+    <div className="border-t border-slate-50 dark:border-slate-800">
       <button onClick={onToggle} className="flex w-full items-center gap-3 px-5 py-3 text-left">
-        <ChevronDown size={14} className={clsx("shrink-0 text-slate-400 transition-transform", open && "rotate-180")} />
-        <p className="min-w-0 flex-1 truncate text-sm text-slate-700">{item.title}</p>
+        <ChevronDown size={14} className={clsx("shrink-0 text-slate-400 dark:text-slate-500 transition-transform", open && "rotate-180")} />
+        <p className="min-w-0 flex-1 truncate text-sm text-slate-700 dark:text-slate-300">{item.title}</p>
         <AudienceBadge audience={item.audience} />
         <ComplianceBadge status={item.assessment.status} />
       </button>
 
       {open && (
         <div className="animate-fade-in space-y-3 px-5 pb-5 pl-11">
-          <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">In plain English</p>
-            <p className="mt-1 text-xs text-slate-700">{item.description}</p>
+          <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">In plain English</p>
+            <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">{item.description}</p>
           </div>
           {item.sourceText && (
-            <div className="rounded-lg border border-slate-200 p-3">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-900">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-900 dark:text-slate-100">
                   What the DfE standard says, word for word
                 </p>
                 {item.govLink && (
@@ -235,7 +235,7 @@ function ComplianceManageRow({
                     href={item.govLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 hover:underline"
+                    className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:underline"
                   >
                     View on GOV.UK
                     <ExternalLink size={11} />
@@ -257,7 +257,7 @@ function ComplianceManageRow({
             />
           )}
           {item.assessment.reviewedAt && (
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 dark:text-slate-500">
               Last updated {new Date(item.assessment.reviewedAt).toLocaleDateString("en-GB")}
               {item.assessment.reviewedByName ? ` by ${item.assessment.reviewedByName}` : ""}
             </p>

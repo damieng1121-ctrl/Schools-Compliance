@@ -6,9 +6,9 @@ function initials(name: string): string {
 }
 
 const PALETTE = [
-  "bg-amber-100 text-amber-700",
-  "bg-emerald-100 text-emerald-700",
-  "bg-sky-100 text-sky-700",
+  "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300",
+  "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300",
+  "bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300",
   "bg-violet-100 text-violet-700",
   "bg-teal-100 text-teal-700",
 ];

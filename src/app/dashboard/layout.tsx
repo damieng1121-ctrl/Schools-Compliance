@@ -18,7 +18,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
     : null;
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col bg-[#f7f7f8] print:block print:bg-white lg:flex-row">
+    <div className="flex min-h-screen flex-1 flex-col bg-[#f7f7f8] dark:bg-slate-950 print:block print:bg-white lg:flex-row">
       <IdleTimeout />
       <div className="print:hidden">
         <DashboardNav

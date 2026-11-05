@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f7f7f8;
   --foreground: #16181d;
+}
+
+.dark {
+  --background: #020617;
+  --foreground: #f1f5f9;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -38,6 +46,12 @@ body {
   font-size: 1.05rem;
   font-weight: 700;
   color: #0f172a;
+}
+
+.dark .legal-prose h2,
+.dark .legal-prose li > strong,
+.dark .legal-prose a {
+  color: #f1f5f9;
 }
 
 .legal-prose h2:first-child {
